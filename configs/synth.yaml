@@ -37,6 +37,16 @@ scene:
   min_slide_clearance_mm: 0.3   # neighbouring slides never touch or overlap
   label_mm: [25.0, 20.0]   # width, height
   label_text_lines: [3, 4]
+  # Label fonts: DejaVu (free licence), installed with `sudo apt install fonts-dejavu`
+  # (core + extra; Condensed is in extra). Each family = [regular, bold]; one is picked
+  # per label. Missing files are an error, never a silent fallback.
+  fonts:
+    dir: /usr/share/fonts/truetype/dejavu
+    families:
+      - [DejaVuSans.ttf, DejaVuSans-Bold.ttf]
+      - [DejaVuSansCondensed.ttf, DejaVuSansCondensed-Bold.ttf]
+      - [DejaVuSansMono.ttf, DejaVuSansMono-Bold.ttf]
+      - [DejaVuSerif.ttf, DejaVuSerif-Bold.ttf]
   tissue:
     pieces: [1, 4]
     faint_prob: 0.25

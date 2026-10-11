@@ -2,11 +2,11 @@
 # One-time setup inside WSL2 Ubuntu 24.04 (run from the repo root inside the Linux
 # file system, e.g. ~/slideqr-seg). The apt step needs your sudo password, so it is
 # printed rather than run:
-#   sudo apt update && sudo apt install -y python3-venv python3-pip libdmtx0b
+#   sudo apt update && sudo apt install -y python3-venv python3-pip libdmtx0b fonts-dejavu
 set -euo pipefail
 
-for pkg in python3-venv libdmtx0b; do
-  dpkg -s "$pkg" >/dev/null 2>&1 || { echo "missing $pkg: sudo apt install -y python3-venv python3-pip libdmtx0b"; exit 1; }
+for pkg in python3-venv libdmtx0b fonts-dejavu; do
+  dpkg -s "$pkg" >/dev/null 2>&1 || { echo "missing $pkg: sudo apt install -y python3-venv python3-pip libdmtx0b fonts-dejavu"; exit 1; }
 done
 case "$(pwd)" in /mnt/*) echo "run this from the Linux file system (e.g. ~/slideqr-seg), not /mnt/c"; exit 1;; esac
 

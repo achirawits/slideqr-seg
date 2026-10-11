@@ -23,27 +23,30 @@ on either side.
 2. Check the GPU is visible inside Ubuntu: `nvidia-smi` (the Windows NVIDIA driver is
    enough; do **not** install a Linux driver inside WSL).
 3. System packages (needs your sudo password):
-   `sudo apt update && sudo apt install -y python3-venv python3-pip libdmtx0b`
+   `sudo apt update && sudo apt install -y python3-venv python3-pip libdmtx0b fonts-dejavu`
+   (`libdmtx0b` encodes DataMatrix; `fonts-dejavu` provides the label fonts)
 4. Put the repo in the **Linux file system**, not under `/mnt/c`. Reading thousands
    of images through `/mnt/c` makes training I/O very slow.
    `git clone <repo url> ~/slideqr-seg && cd ~/slideqr-seg`
 5. Python env with PyTorch **cu128** (RTX 5070 = sm_120) and the training packages:
    `bash scripts/setup_wsl.sh`
-6. Regenerate the dataset inside Linux from the same seed (deterministic per
-   image; label fonts are read from `/mnt/c/Windows/Fonts`, or set `SLIDEQR_FONT_DIR`):
+6. Regenerate the dataset inside Linux from the same seed (deterministic per image):
    `.venv/bin/python scripts/generate.py --out data/synth_v1 --n-rig 3000 --n-handheld 600 --workers 8`
    WSL gets half of the Windows RAM by default (15 GB here); ~1.2 GB per worker.
 
-Note: datasets generated on Windows and on Linux use the same seeds and fonts but are
-not guaranteed bit-identical (JPEG/OpenCV builds differ). Train and test on data made
-on one side.
+### Label fonts
 
-### Windows only (generator, no training)
+Labels use **DejaVu** fonts (free licence) so every teammate renders the same text:
+`scene.fonts.dir` (default `/usr/share/fonts/truetype/dejavu`) and
+`scene.fonts.families` in `configs/synth.yaml` - DejaVu Sans, Sans Condensed, Sans
+Mono, Serif, each with its bold face (the sample-id line is bold). A missing font file
+stops the generator with an error; there is no silent fallback. No font files are
+stored in the repo.
 
-```bash
-python -m venv .venv
-.venv\Scripts\python -m pip install -r requirements.txt
-```
+The reference dataset is generated on Ubuntu 24.04 (WSL2). On another OS, point
+`scene.fonts.dir` at a folder holding the same DejaVu .ttf files; images will match
+closely but are not guaranteed bit-identical (OpenCV/JPEG builds differ), so train
+and test on data generated on one platform.
 
 ## Steps 2-3 - training and evaluation
 

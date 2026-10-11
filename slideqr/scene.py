@@ -1,4 +1,6 @@
 """Random scene layout and camera sampling (geometry only, no pixels)."""
+import os
+
 import numpy as np
 
 from . import codes as C
@@ -6,9 +8,6 @@ from . import geometry as G
 
 STAINS = ["H&E", "H&E", "H&E", "PAS", "GMS", "AFB", "IHC CK7", "IHC CD20", "Ki-67", "Masson"]
 HEADERS = ["Pathology", "Surg Path", "Histology", "Path Lab", "Cytology"]
-FONTS = ["arial.ttf", "calibri.ttf", "tahoma.ttf", "segoeui.ttf"]
-BOLD = {"arial.ttf": "arialbd.ttf", "calibri.ttf": "calibrib.ttf", "tahoma.ttf": "tahomabd.ttf",
-        "segoeui.ttf": "segoeui.ttf"}
 
 Z_BACKGROUND = 12.0   # papers lie below the tray top
 Z_TRAY = 0.0
@@ -82,7 +81,8 @@ def _slide_content(cfg, rng, sw, sh):
     lines = [rng.choice(HEADERS), sample_id, rng.choice(STAINS), _random_date(rng)]
     if n_lines == 3:
         lines.pop(int(rng.choice([0, 3])))
-    font = str(rng.choice(FONTS))
+    fc = sc["fonts"]
+    regular, bold = fc["families"][int(rng.integers(0, len(fc["families"])))]
     right = max(quiet, 1.0) + rng.uniform(0, 0.6)
     code_x = lw - right - code_mm
     free_y = lh - code_mm
@@ -98,7 +98,7 @@ def _slide_content(cfg, rng, sw, sh):
         tissue_faint=bool(rng.random() < sc["tissue"]["faint_prob"]),
         symbology=sym, modules=mods, payload=payload, sample_id=sample_id, matrix=matrix,
         label=dict(size=(lw, lh), code_mm=code_mm, code_x_mm=code_x, code_y_mm=code_y,
-                   text=lines, font=font, font_bold=BOLD[font],
+                   text=lines, font=os.path.join(fc["dir"], regular), font_bold=os.path.join(fc["dir"], bold),
                    font_mm=rng.uniform(1.6, 2.1), line_spacing=rng.uniform(1.15, 1.35),
                    text_x_mm=rng.uniform(0.8, 1.4), text_y_mm=rng.uniform(1.0, 2.5),
                    paper=(p * rng.uniform(0.96, 1.0), p, p * rng.uniform(0.99, 1.02)),

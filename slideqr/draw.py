@@ -12,22 +12,6 @@ from PIL import Image, ImageDraw, ImageFont
 from . import geometry as G
 
 SHIFT = 4
-FONT_FILES = ["arial.ttf", "calibri.ttf", "tahoma.ttf", "consola.ttf", "segoeui.ttf"]
-
-
-def _find_font_dir():
-    """Windows fonts are used on every OS so datasets look the same; under WSL they
-    are read from /mnt/c. Override with SLIDEQR_FONT_DIR."""
-    candidates = [os.environ.get("SLIDEQR_FONT_DIR"),
-                  os.path.join(os.environ.get("WINDIR", "C:/Windows"), "Fonts"),
-                  "/mnt/c/Windows/Fonts"]
-    for d in candidates:
-        if d and os.path.isfile(os.path.join(d, "arial.ttf")):
-            return d
-    raise FileNotFoundError("Windows fonts not found; set SLIDEQR_FONT_DIR to a folder containing arial.ttf")
-
-
-FONT_DIR = _find_font_dir()
 
 
 class Canvas:
@@ -466,9 +450,12 @@ def draw_slide(slide, res, rng):
 
 # ---------------------------------------------------------------- label
 
-def load_font(name, size_px):
+def load_font(path, size_px):
     # no silent fallback: a missing font would change every label without notice
-    return ImageFont.truetype(os.path.join(FONT_DIR, name), size_px)
+    if not os.path.isfile(path):
+        raise FileNotFoundError(f"label font {path} not found (sudo apt install fonts-dejavu, "
+                                "or point scene.fonts.dir to a folder with the DejaVu .ttf files)")
+    return ImageFont.truetype(path, size_px)
 
 
 def draw_label(label, matrix, rng):
@@ -492,12 +479,12 @@ def draw_label(label, matrix, rng):
     text_w_px = code_x_px - int(0.8 * res) - int(label["text_x_mm"] * res)
     y = label["text_y_mm"] * res
     font_px = int(label["font_mm"] * res)
-    font = load_font(label["font"], font_px)
     for i, line in enumerate(label["text"]):
-        f = font if i != 1 else load_font(label["font_bold"], font_px)
+        path = label["font_bold"] if i == 1 else label["font"]   # sample id in bold
+        f = load_font(path, font_px)
         while f.getlength(line) > text_w_px and font_px > 6:
             font_px -= 1
-            f = load_font(label["font"], font_px)
+            f = load_font(path, font_px)
         d.text((label["text_x_mm"] * res, y), line, fill=255, font=f)
         y += font_px * label["line_spacing"]
     ink = np.asarray(pil, np.float32)[..., None] / 255.0
