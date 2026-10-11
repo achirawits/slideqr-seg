@@ -1,0 +1,28 @@
+# Real lab photos contain patient sample numbers: never commit any image.
+real/
+data/
+runs/
+.venv/
+*.pt
+*.pth
+*.onnx
+*.safetensors
+
+# all image formats
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.bmp
+*.tif
+*.tiff
+*.gif
+*.heic
+*.heif
+*.dng
+*.raw
+
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.claude/

@@ -1,0 +1,11 @@
+# Step 1: synthetic data generator (CPU only)
+numpy>=2.0
+opencv-python>=4.10
+pillow>=10
+pyyaml>=6
+segno>=1.6
+pylibdmtx>=0.1.10
+setuptools          # provides the distutils shim pylibdmtx needs on Python 3.12
+zxing-cpp>=2.3
+tqdm
+# Step 2 (training) adds PyTorch cu128 - see README.

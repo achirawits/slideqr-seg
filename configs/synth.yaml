@@ -1,0 +1,148 @@
+# Synthetic slide-label scene generator config.
+# All physical sizes are millimetres. Pixel sizes are derived at render time.
+# Override any key from the CLI:  --set code.CODE_SIZE_MM=6.5 degrade.glare.enabled=false
+
+seed: 1234
+
+code:
+  # Symbol size WITHOUT quiet zone, measured edge-to-edge on the real label.
+  # Provisional, estimated from real photos. TODO(after measuring real labels): replace.
+  CODE_SIZE_MM: 6.5
+  # Modules per side for each symbology (QR v1 = 21, v2 = 25; DataMatrix 10..26 square).
+  CODE_MODULES:
+    qr: 21
+    datamatrix: 18
+  symbology: datamatrix    # qr | datamatrix | mixed   (provisional: DataMatrix 18x18)
+  mixed_qr_fraction: 0.5   # used only when symbology == mixed
+  qr_error: m              # l | m | q | h
+  quiet_zone_modules: 2    # white margin printed around the symbol on the label
+  # Payload = sample id printed on the label (randomly generated, never real data).
+  payload: sample_id       # sample_id | random_alnum
+
+scale:
+  # Pixels per module at the code plane, sampled stratified over this range.
+  ppm_range: [2.0, 8.0]
+
+scene:
+  max_slides: 10
+  min_slides: 1
+  tray_slots: 12           # slots on the tray; occupied ones are chosen at random
+  slide_mm: [25.0, 75.0]   # width, height (portrait)
+  slide_pitch_mm: 28.0     # slot centre-to-centre distance (provisional, from real photos)
+  slide_jitter_mm: 0.8
+  # Slot-type surfaces (trays, desk, paper): per-slide tilt (deg, |rot| <= this). All slides share one
+  # orientation with the label at the top end; larger rotation comes only from
+  # the camera, which turns the whole tray together.
+  slide_rot_deg: 2.5
+  min_slide_clearance_mm: 0.3   # neighbouring slides never touch or overlap
+  label_mm: [25.0, 20.0]   # width, height
+  label_text_lines: [3, 4]
+  tissue:
+    pieces: [1, 4]
+    faint_prob: 0.25
+  background:
+    wire_basket_prob: 0.8
+    folder_prob: 0.7
+  hand:
+    prob: 0.0              # fingers/hand disabled for this dataset
+    max_fingers: 4
+  paper_edge_prob: 0.3     # loose paper sheet edge in the foreground
+  # Surface the slides lie on. Slides are always in one row. The chosen type and
+  # variant are written to metadata.csv (surface, surface_variant).
+  # To use a single type: --set scene.surface.types=[pla_base] scene.surface.weights=[1]
+  # slide_box is implemented but not in the default mix.
+  surface:
+    types:   [pla_base, steel_tray, plastic_tray, desk, paper]
+    weights: [1, 1, 1, 1, 1]
+  # The real rig: flat light-grey PLA plate, no grooves or stops. Slides lie freely
+  # inside an engraved frame (slide_pitch_mm / slide_rot_deg above apply to the
+  # other, slot-type surfaces only).
+  pla_base:
+    plate_mm: [380.0, 150.0]
+    frame_mm: [300.0, 90.0]   # engraved outline, centred on the plate
+    tick_pitch_mm: 28.0       # short engraved ticks on the top edge of the frame
+    n_ticks: 10
+    tick_len_mm: 6.0          # straddles the frame line: half inside, half outside
+    gap_mm: [2.0, 10.0]       # free gap between neighbouring slides
+    max_tilt_deg: 5.0
+
+camera:
+  # Output resolution shared by both modes. Not tied to any camera model;
+  # override freely, e.g. --set camera.image_size=[4000,3000]
+  image_size: [3264, 2448]
+  rig:
+    # bridge rig: camera hangs straight down over the middle of the row
+    hfov_deg: [50, 65]
+    tilt_deg: [0, 1]           # mounting tolerance only
+    roll_deg: [-2, 2]
+    center_jitter_mm: 3.0      # aim point = middle of the row (PLA: frame centre) +- this
+  handheld:
+    hfov_deg: [62, 72]
+    tilt_deg: [18, 42]
+    roll_deg: [-25, 25]
+    portrait_prob: 0.0         # keep same W,H for comparability
+
+# Every degradation can be toggled and its strength set independently.
+# p = probability it is applied to an image; ranges are sampled uniformly.
+degrade:
+  label_stain:
+    enabled: true
+    p: 0.25
+    strength: [0.05, 0.35]
+  label_wrinkle:
+    enabled: true
+    p: 0.2
+    strength: [0.03, 0.12]
+  color_temp:
+    enabled: true
+    p: 0.9
+    kelvin: [3000, 7000]
+  uneven_light:
+    enabled: true
+    p: 0.7
+    strength: [0.05, 0.35]
+  shadow:
+    enabled: true
+    p: 0.35
+    strength: [0.15, 0.5]
+  glare:
+    enabled: true
+    p: 0.6
+    strength: [0.2, 1.0]
+    # relative reflectivity per material; paper is far less reflective
+    reflectivity: {background: 0.25, metal: 1.0, glass: 0.9, label: 0.12, tissue: 0.6, hand: 0.25,
+                   plastic: 0.4, wood: 0.35, pla: 0.15}
+  defocus:
+    enabled: true
+    p: 0.4
+    sigma_px: [0.3, 1.6]
+  motion_blur:
+    enabled: true
+    p: 0.25            # handheld uses p_handheld instead
+    p_handheld: 0.7
+    length_px: [1.0, 5.0]
+  vignetting:
+    enabled: true
+    p: 0.6
+    strength: [0.1, 0.45]
+  noise:
+    enabled: true
+    p: 0.9
+    sigma: [1.0, 6.0]  # in 0..255 units, read noise
+    shot: [0.0, 0.03]  # Poisson-like term
+  jpeg:
+    enabled: true
+    p: 0.9
+    quality: [55, 95]
+
+labels:
+  include_slide_class: true
+  min_visible_frac: 0.5    # below this a code is flagged and treated as ignore
+
+split:
+  ratios: {train: 0.7, val: 0.15, test: 0.15}
+  handheld_test_only: true
+
+render:
+  texture_oversample: 1.25   # texture px/mm relative to the image px/mm
+  jpeg_out: true
