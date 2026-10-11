@@ -85,13 +85,13 @@ def compose(img, mask_panel, over, texts, title, box):
     target_w = 2400
     row = cv2.resize(row, (target_w, int(row.shape[0] * target_w / row.shape[1])), interpolation=cv2.INTER_AREA)
     lines = max(1, (len(texts) + 2) // 3)
-    footer = np.full((60 + 34 * lines, target_w, 3), 25, np.uint8)
-    label(footer, title, (12, 40), 1.0)
+    footer = np.full((80 + 50 * lines, target_w, 3), 25, np.uint8)
+    label(footer, title, (12, 50), 1.3)
     for i, (col, t) in enumerate(texts):
         x = 12 + (i % 3) * (target_w // 3)
-        y = 80 + 34 * (i // 3)
-        cv2.rectangle(footer, (x, y - 20), (x + 24, y + 4), tuple(int(c) for c in col), -1)
-        label(footer, t, (x + 32, y), 0.7)
+        y = 110 + 50 * (i // 3)
+        cv2.rectangle(footer, (x, y - 28), (x + 32, y + 4), tuple(int(c) for c in col), -1)
+        label(footer, t, (x + 42, y), 1.05)
     return np.vstack([row, footer])
 
 
