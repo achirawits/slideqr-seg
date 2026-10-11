@@ -272,17 +272,22 @@ def train_rfdetr(name, cfg, out_dir):
     budget = tc["time_budget_min"] * 60.0
     kw = dict(batch_size=mc["batch"], grad_accum_steps=mc["grad_accum"], lr=mc["lr"], seed=cfg["seed"],
               num_workers=tc["workers"])
-    # The LR schedule follows `epochs`, so estimate how many epochs fit the budget from a
-    # 1-epoch pilot on 5 % of train/val (not counted in the budget), then let Lightning's
-    # max_time stop the real run exactly at the budget.
-    every = 20
-    pilot = rfdetr_dataset(cfg["data_root"], "rfdetr_pilot", every)
-    t0 = time.time()
-    Model(resolution=res).train(dataset_dir=str(pilot), epochs=1, output_dir=str(out_dir / "pilot"), **kw)
-    per_epoch = (time.time() - t0) * every
+    # The LR schedule follows `epochs`, so estimate how many epochs fit the budget, then let
+    # Lightning's max_time stop the real run exactly at the budget. Two 1-epoch pilots on
+    # 1/40 and 1/20 of train/val (not counted in the budget): time = startup + f * epoch,
+    # so the difference removes rfdetr's fixed start-up cost from the estimate.
+    times = {}
+    for every in (40, 20):
+        pilot = rfdetr_dataset(cfg["data_root"], f"rfdetr_pilot{every}", every)
+        t0 = time.time()
+        Model(resolution=res).train(dataset_dir=str(pilot), epochs=1, output_dir=str(out_dir / f"pilot{every}"), **kw)
+        times[every] = time.time() - t0
+    per_epoch = (times[20] - times[40]) / (1 / 20 - 1 / 40)
+    if per_epoch <= 0:  # noise on tiny data: fall back to the plain scale-up
+        per_epoch = times[20] * 20
     epochs = max(1, int(budget // per_epoch))
-    print(f"rfdetr: ~{per_epoch:.0f} s/epoch (pilot x{every}) -> {epochs} epochs, hard stop at "
-          f"{budget / 60:.0f} min", flush=True)
+    print(f"rfdetr: pilots {times[40]:.0f}s / {times[20]:.0f}s -> ~{per_epoch:.0f} s/epoch -> {epochs} epochs, "
+          f"hard stop at {budget / 60:.0f} min", flush=True)
     ds = rfdetr_dataset(cfg["data_root"])
     orig = _rfdetr_max_time(budget)
     try:
