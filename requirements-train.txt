@@ -3,4 +3,4 @@
 # Versions are pinned after the first successful install (see README).
 pycocotools
 ultralytics
-rfdetr
+rfdetr[train,loggers]    # since rfdetr 1.11 training needs the extras (PyTorch Lightning)
