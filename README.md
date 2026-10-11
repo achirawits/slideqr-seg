@@ -48,6 +48,49 @@ The reference dataset is generated on Ubuntu 24.04 (WSL2). On another OS, point
 closely but are not guaranteed bit-identical (OpenCV/JPEG builds differ), so train
 and test on data generated on one platform.
 
+## Library versions used (WSL2 Ubuntu 24.04, RTX 5070)
+
+| package | version |
+|---|---|
+| Python | 3.12.3 |
+| torch / torchvision | 2.11.0+cu128 / 0.26.0+cu128 (sm_120 in arch list) |
+| ultralytics | 8.4.175 (yolo11n-seg.pt, yolo26n-seg.pt) |
+| rfdetr | 1.11.2 with `[train,loggers]` extras, pytorch-lightning 2.6.6 |
+| supervision / transformers | 0.30.9 / 5.19.0 |
+| pycocotools | 2.0.11 |
+| numpy / opencv-python / pillow | 2.5.4 / 5.0.0.93 / 12.3.0 |
+| segno / pylibdmtx / zxing-cpp | 1.6.6 / 0.1.10 / 3.1.1 |
+| system | libdmtx0t64 0.7.7, fonts-dejavu |
+
+Each training run also saves the versions it actually used in
+`runs/train/<model>/train_summary.json`.
+
+### API adjustments found on the first run
+
+* **RF-DETR 1.11.2**
+  * Training needs the extras: `pip install "rfdetr[train,loggers]"` (PyTorch Lightning).
+  * Smallest segmentation model: `RFDETRSegNano` (patch 12, default 312 px). The
+    resolution must be a multiple of `patch_size x num_windows` = 12, so the shared
+    1280 px becomes **1272 px**.
+  * Batch 2 at 1272 px runs out of the 12 GB; **batch 1 x gradient accumulation 8**
+    peaks at ~8 GiB (effective batch 8, same as YOLO). `gradient_checkpointing` is a
+    model-config field, not a `train()` argument.
+  * `predict()` returns `class_id` as the **0-based index into `model.class_names`**,
+    not the COCO category id. Mapping it as COCO ids scored slides as codes; evaluation
+    now maps through `class_names` and checks the names.
+  * `train()` has no wall-clock limit and rejects unknown Trainer arguments. The
+    budget is enforced with Lightning `max_time` by wrapping
+    `rfdetr.training.build_trainer`; the epoch count for the LR schedule comes from
+    two short pilots (1/40 and 1/20 of the data, outside the budget).
+* **Ultralytics 8.4**: settings are written to `runs/ultralytics_config`
+  (`YOLO_CONFIG_DIR`), because `~/.config` was not writable in this WSL setup.
+* **pycocotools**: `COCO.loadRes` adds keys to the result dicts in place, so it gets
+  copies when called more than once.
+* **Latency** is reported twice: the model alone (pre-processing, forward pass, the
+  model's own post-processing) and the full pipeline (plus full-resolution masks, RLE,
+  contours). The first version timed only the pipeline, where the CPU-side mask work
+  hid the difference between GPU and CPU.
+
 ## Steps 2-3 - training and evaluation
 
 Shared conditions in `configs/train.yaml`: same split, input long side 1280 for every
@@ -55,7 +98,8 @@ model, same wall-clock budget (default 60 min, validation included), seed 0. The
 resolved config and package versions are saved in `runs/train/<model>/`.
 
 ```bash
-.venv/bin/python scripts/train.py --model maskrcnn    # also: yolo11n, yolo26n, rfdetr
+bash scripts/run_all.sh                               # all four, one after another
+.venv/bin/python scripts/train.py --model maskrcnn    # or one model: yolo11n, yolo26n, rfdetr
 .venv/bin/python scripts/evaluate.py --model maskrcnn
 .venv/bin/python scripts/report.py --out docs/results_synthetic.md
 ```
@@ -66,8 +110,8 @@ ways of feeding the decoder: the whole image, an axis-aligned crop of the predic
 mask, and a perspective warp from the predicted 4 corners; read rate and wrong reads
 per ppm bin, with the camera-decision bins 3.5-4.0 ppm (8 MP on the PLA base) and
 4.5-5.0 ppm (12 MP) listed separately; latency on GPU and CPU, parameter count,
-license. RF-DETR has no wall-clock stop, so one pilot epoch is timed first (outside
-the budget) and the number of epochs that fits the budget is used.
+license. How each framework is held to the budget: Ultralytics `time=`, Mask R-CNN a
+time-based loop (cosine LR over the budget), RF-DETR Lightning `max_time` (see above).
 
 ## Step 1 - synthetic scenes
 
