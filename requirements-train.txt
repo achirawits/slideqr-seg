@@ -1,0 +1,6 @@
+# Step 2-3 (training / evaluation). Install PyTorch cu128 FIRST:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+# Versions are pinned after the first successful install (see README).
+pycocotools
+ultralytics
+rfdetr

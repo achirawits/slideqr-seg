@@ -1,0 +1,53 @@
+# Shared training / evaluation settings. Every model gets the same data split,
+# the same input size (long side), the same wall-clock budget and the same seed.
+# Override from the CLI: --set train.time_budget_min=90
+
+seed: 0
+data_root: data/synth_v1          # output of scripts/generate.py
+
+train:
+  imgsz: 1280                     # long side of the network input, all models
+  time_budget_min: 60             # wall-clock training budget per model, includes validation
+  workers: 8
+  classes: [code, slide]
+
+models:
+  maskrcnn:
+    family: torchvision
+    weights: COCO_V1              # maskrcnn_resnet50_fpn, COCO-pretrained
+    batch: 2
+    lr: 0.01
+    license: "BSD-3-Clause (torchvision code); COCO-pretrained weights"
+  yolo11n:
+    family: ultralytics
+    weights: yolo11n-seg.pt
+    batch: 8
+    license: "AGPL-3.0 (Ultralytics) or Ultralytics Enterprise License"
+  yolo26n:
+    family: ultralytics
+    weights: yolo26n-seg.pt
+    batch: 8
+    license: "AGPL-3.0 (Ultralytics) or Ultralytics Enterprise License"
+  rfdetr:
+    family: rfdetr
+    size: smallest                # smallest RF-DETR segmentation variant available
+    batch: 2
+    grad_accum: 4
+    lr: 0.0001
+    license: "check installed rfdetr version (code Apache-2.0; see model card for weights)"
+
+eval:
+  score_thr: 0.5                  # detections used for decoding / corner error
+  ap_score_thr: 0.001             # detections kept for COCO AP
+  max_det: 50
+  iou_match: 0.5                  # prediction <-> ground truth match for corners / decoding
+  # ppm bins (measured on the rendered code) for every per-bin table
+  ppm_bins: [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 9.0, 12.0]
+  # camera-decision bins reported separately
+  focus_bins:
+    "8MP on PLA base": [3.5, 4.0]
+    "12MP on PLA base": [4.5, 5.0]
+  rectify_px_per_module: 8
+  crop_margin_frac: 0.25          # axis-aligned crop: bbox grown by this fraction per side
+  timing_images_gpu: 50
+  timing_images_cpu: 10

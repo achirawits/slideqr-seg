@@ -12,8 +12,22 @@ from PIL import Image, ImageDraw, ImageFont
 from . import geometry as G
 
 SHIFT = 4
-FONT_DIR = os.path.join(os.environ.get("WINDIR", "C:/Windows"), "Fonts")
 FONT_FILES = ["arial.ttf", "calibri.ttf", "tahoma.ttf", "consola.ttf", "segoeui.ttf"]
+
+
+def _find_font_dir():
+    """Windows fonts are used on every OS so datasets look the same; under WSL they
+    are read from /mnt/c. Override with SLIDEQR_FONT_DIR."""
+    candidates = [os.environ.get("SLIDEQR_FONT_DIR"),
+                  os.path.join(os.environ.get("WINDIR", "C:/Windows"), "Fonts"),
+                  "/mnt/c/Windows/Fonts"]
+    for d in candidates:
+        if d and os.path.isfile(os.path.join(d, "arial.ttf")):
+            return d
+    raise FileNotFoundError("Windows fonts not found; set SLIDEQR_FONT_DIR to a folder containing arial.ttf")
+
+
+FONT_DIR = _find_font_dir()
 
 
 class Canvas:
@@ -453,11 +467,8 @@ def draw_slide(slide, res, rng):
 # ---------------------------------------------------------------- label
 
 def load_font(name, size_px):
-    path = os.path.join(FONT_DIR, name)
-    try:
-        return ImageFont.truetype(path, size_px)
-    except OSError:
-        return ImageFont.load_default()
+    # no silent fallback: a missing font would change every label without notice
+    return ImageFont.truetype(os.path.join(FONT_DIR, name), size_px)
 
 
 def draw_label(label, matrix, rng):

@@ -7,17 +7,64 @@ labels, predicting the code's 4 corners as a polygon, plus a model comparison.
 > models are tested on real photos. Real photos (`real/`) contain patient sample
 > numbers and are never committed (see `.gitignore`).
 
-Status: **Step 1 (synthetic generator) - waiting for review.** Steps 2-4 not started.
+Status: Step 1 (synthetic generator) approved. Steps 2-3 (training, evaluation): scripts ready.
 
-## Setup (Windows 11, Python 3.12)
+## Setup
+
+Training runs in **WSL2 Ubuntu 24.04**. On this Windows 11 machine Smart App Control
+blocks the unsigned `torch.dll` (`WinError 4551`), so PyTorch cannot load natively;
+the Linux build inside WSL2 uses the same RTX 5070. The data generator (CPU only) runs
+on either side.
+
+### WSL2 (training + data)
+
+1. Windows, PowerShell as administrator, then reboot:
+   `wsl --install -d Ubuntu-24.04`
+2. Check the GPU is visible inside Ubuntu: `nvidia-smi` (the Windows NVIDIA driver is
+   enough; do **not** install a Linux driver inside WSL).
+3. System packages (needs your sudo password):
+   `sudo apt update && sudo apt install -y python3-venv python3-pip libdmtx0b`
+4. Put the repo in the **Linux file system**, not under `/mnt/c`. Reading thousands
+   of images through `/mnt/c` makes training I/O very slow.
+   `git clone <repo url> ~/slideqr-seg && cd ~/slideqr-seg`
+5. Python env with PyTorch **cu128** (RTX 5070 = sm_120) and the training packages:
+   `bash scripts/setup_wsl.sh`
+6. Regenerate the dataset inside Linux from the same seed (deterministic per
+   image; label fonts are read from `/mnt/c/Windows/Fonts`, or set `SLIDEQR_FONT_DIR`):
+   `.venv/bin/python scripts/generate.py --out data/synth_v1 --n-rig 3000 --n-handheld 600 --workers 8`
+   WSL gets half of the Windows RAM by default (15 GB here); ~1.2 GB per worker.
+
+Note: datasets generated on Windows and on Linux use the same seeds and fonts but are
+not guaranteed bit-identical (JPEG/OpenCV builds differ). Train and test on data made
+on one side.
+
+### Windows only (generator, no training)
 
 ```bash
 python -m venv .venv
 .venv\Scripts\python -m pip install -r requirements.txt
 ```
 
-Step 2 will add PyTorch **cu128 only** (RTX 5070 / sm_120):
-`pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128`
+## Steps 2-3 - training and evaluation
+
+Shared conditions in `configs/train.yaml`: same split, input long side 1280 for every
+model, same wall-clock budget (default 60 min, validation included), seed 0. The
+resolved config and package versions are saved in `runs/train/<model>/`.
+
+```bash
+.venv/bin/python scripts/train.py --model maskrcnn    # also: yolo11n, yolo26n, rfdetr
+.venv/bin/python scripts/evaluate.py --model maskrcnn
+.venv/bin/python scripts/report.py --out docs/results_synthetic.md
+```
+
+Evaluation (rig test set and handheld test set reported separately): mask AP50 and
+AP50:95; corner error after turning each mask into a 4-corner quad; decoding with three
+ways of feeding the decoder: the whole image, an axis-aligned crop of the predicted
+mask, and a perspective warp from the predicted 4 corners; read rate and wrong reads
+per ppm bin, with the camera-decision bins 3.5-4.0 ppm (8 MP on the PLA base) and
+4.5-5.0 ppm (12 MP) listed separately; latency on GPU and CPU, parameter count,
+license. RF-DETR has no wall-clock stop, so one pilot epoch is timed first (outside
+the budget) and the number of epochs that fits the budget is used.
 
 ## Step 1 - synthetic scenes
 
