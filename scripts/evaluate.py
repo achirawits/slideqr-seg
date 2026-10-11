@@ -40,7 +40,12 @@ def make_predictor(name, cfg, device, score_floor, train_dir):
         from train import rfdetr_class, rfdetr_resolution
         Model = rfdetr_class()
         model = Model(pretrain_weights=w, resolution=rfdetr_resolution(Model, imgsz), device=device)
-        return M.RFDETRPredictor(model, {1: "code", 2: "slide"}, device, score_floor, max_det)
+        # rfdetr class_id is the 0-based index into model.class_names, NOT the COCO
+        # category id (checked: class_id 1 masks have slide-sized areas)
+        names = list(model.class_names)
+        if set(names) != set(M.CLASSES):
+            raise ValueError(f"unexpected rfdetr class names {names}")
+        return M.RFDETRPredictor(model, dict(enumerate(names)), device, score_floor, max_det)
     raise ValueError(fam)
 
 
