@@ -12,7 +12,6 @@ import math
 import os
 import platform
 import random
-import shutil
 import sys
 import time
 from pathlib import Path
@@ -226,45 +225,70 @@ def rfdetr_resolution(model_cls, imgsz):
     return (int(imgsz) // block) * block
 
 
-def rfdetr_dataset(root):
+def rfdetr_dataset(root, name="rfdetr", every=1):
     """Roboflow-style COCO layout (train/valid/test/*.json next to images) built from
-    hard links, so no image is copied."""
+    hard links, so no image is copied. every=k keeps every k-th image (pilot runs)."""
     import os
     root = Path(root)
-    out = root / "rfdetr"
-    for split, name in [("train", "train"), ("val", "valid"), ("test", "test"), ("test_handheld", "test_handheld")]:
+    out = root / name
+    for split, sub in [("train", "train"), ("val", "valid"), ("test", "test"), ("test_handheld", "test_handheld")]:
         src = root / "annotations" / f"instances_{split}.json"
         if not src.exists():
             continue
-        d = out / name
+        d = out / sub
         d.mkdir(parents=True, exist_ok=True)
         data = json.loads(src.read_text(encoding="utf-8"))
+        data["images"] = sorted(data["images"], key=lambda im: im["id"])[::every]
+        keep = {im["id"] for im in data["images"]}
+        data["annotations"] = [a for a in data["annotations"] if a["image_id"] in keep]
         for im in data["images"]:
             dst = d / im["file_name"]
             if not dst.exists():
                 os.link(root / "images" / split / im["file_name"], dst)
-        shutil.copyfile(src, d / "_annotations.coco.json")
+        (d / "_annotations.coco.json").write_text(json.dumps(data), encoding="utf-8")
     return out
 
 
+def _rfdetr_max_time(seconds):
+    """Make rfdetr's Lightning Trainer stop at a wall-clock limit (rfdetr's train() does
+    not expose Trainer kwargs, so wrap the builder it imports at call time)."""
+    import datetime
+    import rfdetr.training as rt
+    orig = rt.build_trainer
+
+    def build(tc, mc, **kw):
+        kw.setdefault("max_time", datetime.timedelta(seconds=int(seconds)))
+        return orig(tc, mc, **kw)
+    rt.build_trainer = build
+    return orig
+
+
 def train_rfdetr(name, cfg, out_dir):
+    import rfdetr.training as rt
     mc, tc = cfg["models"][name], cfg["train"]
     Model = rfdetr_class()
-    ds = rfdetr_dataset(cfg["data_root"])
     res = rfdetr_resolution(Model, tc["imgsz"])
     print(f"rfdetr: {Model.__name__}, resolution {res}", flush=True)
-    model = Model(resolution=res)
     budget = tc["time_budget_min"] * 60.0
-    # rfdetr has no wall-clock stop: time one epoch, then train for as many epochs as fit
+    kw = dict(batch_size=mc["batch"], grad_accum_steps=mc["grad_accum"], lr=mc["lr"], seed=cfg["seed"],
+              num_workers=tc["workers"])
+    # The LR schedule follows `epochs`, so estimate how many epochs fit the budget from a
+    # 1-epoch pilot on 5 % of train/val (not counted in the budget), then let Lightning's
+    # max_time stop the real run exactly at the budget.
+    every = 20
+    pilot = rfdetr_dataset(cfg["data_root"], "rfdetr_pilot", every)
     t0 = time.time()
-    model.train(dataset_dir=str(ds), epochs=1, batch_size=mc["batch"], grad_accum_steps=mc["grad_accum"],
-                lr=mc["lr"], output_dir=str(out_dir / "pilot"), seed=cfg["seed"], num_workers=tc["workers"])
-    per_epoch = time.time() - t0
+    Model(resolution=res).train(dataset_dir=str(pilot), epochs=1, output_dir=str(out_dir / "pilot"), **kw)
+    per_epoch = (time.time() - t0) * every
     epochs = max(1, int(budget // per_epoch))
-    print(f"rfdetr: {per_epoch:.0f} s/epoch -> {epochs} epochs in {budget / 60:.0f} min", flush=True)
-    model = Model(resolution=res)
-    model.train(dataset_dir=str(ds), epochs=epochs, batch_size=mc["batch"], grad_accum_steps=mc["grad_accum"],
-                lr=mc["lr"], output_dir=str(out_dir), seed=cfg["seed"], num_workers=tc["workers"])
+    print(f"rfdetr: ~{per_epoch:.0f} s/epoch (pilot x{every}) -> {epochs} epochs, hard stop at "
+          f"{budget / 60:.0f} min", flush=True)
+    ds = rfdetr_dataset(cfg["data_root"])
+    orig = _rfdetr_max_time(budget)
+    try:
+        Model(resolution=res).train(dataset_dir=str(ds), epochs=epochs, output_dir=str(out_dir), **kw)
+    finally:
+        rt.build_trainer = orig
     for cand in ("checkpoint_best_total.pth", "checkpoint_best_ema.pth", "checkpoint_best_regular.pth", "checkpoint.pth"):
         if (out_dir / cand).exists():
             return out_dir / cand
