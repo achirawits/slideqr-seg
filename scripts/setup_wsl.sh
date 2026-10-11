@@ -5,9 +5,12 @@
 #   sudo apt update && sudo apt install -y python3-venv python3-pip libdmtx0b fonts-dejavu
 set -euo pipefail
 
-for pkg in python3-venv libdmtx0b fonts-dejavu; do
-  dpkg -s "$pkg" >/dev/null 2>&1 || { echo "missing $pkg: sudo apt install -y python3-venv python3-pip libdmtx0b fonts-dejavu"; exit 1; }
+HINT="sudo apt install -y python3-venv python3-pip libdmtx0b fonts-dejavu"
+for pkg in python3-venv fonts-dejavu; do
+  dpkg -s "$pkg" >/dev/null 2>&1 || { echo "missing $pkg: $HINT"; exit 1; }
 done
+# Ubuntu 24.04 ships libdmtx as libdmtx0t64 (apt maps libdmtx0b to it): check the library itself
+ldconfig -p | grep -q 'libdmtx\.so' || { echo "missing libdmtx: $HINT"; exit 1; }
 case "$(pwd)" in /mnt/*) echo "run this from the Linux file system (e.g. ~/slideqr-seg), not /mnt/c"; exit 1;; esac
 
 python3 -m venv .venv
