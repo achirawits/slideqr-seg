@@ -31,8 +31,10 @@ models:
   rfdetr:
     family: rfdetr
     size: smallest                # smallest RF-DETR segmentation variant available
-    batch: 2
-    grad_accum: 4
+    # 1272 px (multiple of 12) with single-window attention: batch 2 runs out of 12 GB,
+    # batch 1 peaks at ~8 GiB. Effective batch 8 via gradient accumulation.
+    batch: 1
+    grad_accum: 8
     lr: 0.0001
     license: "check installed rfdetr version (code Apache-2.0; see model card for weights)"
 
