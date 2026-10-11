@@ -51,14 +51,19 @@ class MaskRCNNPredictor_:
         self.model.load_state_dict(torch.load(weights_path, map_location="cpu"))
         self.model.to(device).eval()
 
-    def predict(self, img_bgr):
+    def infer(self, img_bgr):
+        """Resize + forward pass + the model's own post-processing (network resolution)."""
         torch = self.torch
         H, W = img_bgr.shape[:2]
         s = long_side_scale(W, H, self.imgsz)
         small = cv2.resize(img_bgr, (round(W * s), round(H * s)), interpolation=cv2.INTER_AREA)
         x = torch.from_numpy(small[..., ::-1].copy()).permute(2, 0, 1).float().div(255).to(self.device)
         with torch.inference_mode():
-            out = self.model([x])[0]
+            return self.model([x])[0]
+
+    def predict(self, img_bgr):
+        H, W = img_bgr.shape[:2]
+        out = self.infer(img_bgr)
         keep = (out["scores"] >= self.score_floor).nonzero().flatten()[: self.max_det]
         masks = out["masks"][keep, 0].float().cpu().numpy()
         recs = []
@@ -79,6 +84,11 @@ class YoloPredictor:
         self.name = name
         self.model = YOLO(str(weights_path))
         self.imgsz, self.device, self.score_floor, self.max_det = imgsz, device, score_floor, max_det
+
+    def infer(self, img_bgr):
+        """Letterbox + forward + NMS + mask decoding at network resolution."""
+        return self.model.predict(img_bgr, imgsz=self.imgsz, conf=self.score_floor, max_det=self.max_det,
+                                  retina_masks=False, device=self.device, verbose=False)[0]
 
     def predict(self, img_bgr):
         r = self.model.predict(img_bgr, imgsz=self.imgsz, conf=self.score_floor, max_det=self.max_det,
@@ -108,9 +118,13 @@ class RFDETRPredictor:
         self.class_map = class_map          # rfdetr class id -> our class name
         self.device, self.score_floor, self.max_det = device, score_floor, max_det
 
-    def predict(self, img_bgr):
+    def infer(self, img_bgr):
+        """rfdetr's predict (pre-processing, forward, its own post-processing)."""
         from PIL import Image
-        det = self.model.predict(Image.fromarray(img_bgr[..., ::-1]), threshold=self.score_floor)
+        return self.model.predict(Image.fromarray(img_bgr[..., ::-1]), threshold=self.score_floor)
+
+    def predict(self, img_bgr):
+        det = self.infer(img_bgr)
         if det.mask is None or len(det) == 0:
             return []
         order = np.argsort(-det.confidence)[: self.max_det]
@@ -135,18 +149,27 @@ class RFDETRPredictor:
 # ---------------------------------------------------------------- timing
 
 def time_predict(pred, images, device_sync=None, warmup=3):
-    for im in images[:warmup]:
-        pred.predict(im)
-    t = []
-    for im in images:
-        if device_sync:
-            device_sync()
-        t0 = time.perf_counter()
-        pred.predict(im)
-        if device_sync:
-            device_sync()
-        t.append(time.perf_counter() - t0)
-    return dict(mean_s=float(np.mean(t)), median_s=float(np.median(t)), n=len(t))
+    """Two numbers per image, one image at a time:
+    model_s     - pred.infer: pre-processing, forward pass and the model's own
+                  post-processing at network resolution (comparable across models)
+    pipeline_s  - pred.predict: also full-resolution masks, RLE and contours
+                  (CPU-bound, the same work for every model)"""
+    def run(fn):
+        for im in images[:warmup]:
+            fn(im)
+        t = []
+        for im in images:
+            if device_sync:
+                device_sync()
+            t0 = time.perf_counter()
+            fn(im)
+            if device_sync:
+                device_sync()
+            t.append(time.perf_counter() - t0)
+        return t
+    tm, tp = run(pred.infer), run(pred.predict)
+    return dict(model_mean_s=float(np.mean(tm)), model_median_s=float(np.median(tm)),
+                pipeline_mean_s=float(np.mean(tp)), pipeline_median_s=float(np.median(tp)), n=len(images))
 
 
 def save_json(obj, path):

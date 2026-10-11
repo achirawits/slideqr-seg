@@ -23,6 +23,12 @@ def num(x, f="{:.2f}"):
     return "-" if x is None or x != x else f.format(x)
 
 
+def lat(d):
+    if not d:
+        return "-"
+    return f"{d['model_mean_s'] * 1000:.0f} / {d['pipeline_mean_s'] * 1000:.0f}"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="docs/results_synthetic.md")
@@ -39,7 +45,8 @@ def main():
 
     L += ["## Summary", "",
           "| model | params (M) | license | rig AP50 | rig AP50:95 | handheld AP50 | handheld AP50:95 | "
-          "rig corner err (px, median) | GPU ms/img | CPU ms/img |", "|" + "---|" * 10]
+          "rig corner err (px, median) | GPU ms/img model / pipeline | CPU ms/img model / pipeline |",
+          "|" + "---|" * 10]
     for n, m in runs.items():
         s = m["splits"]
         rig, hh = s.get("test", {}), s.get("test_handheld", {})
@@ -48,9 +55,10 @@ def main():
             n, num(m["params"] / 1e6, "{:.1f}"), m["license"],
             num(rig.get("mask_ap_code", {}).get("AP50"), "{:.3f}"), num(rig.get("mask_ap_code", {}).get("AP50_95"), "{:.3f}"),
             num(hh.get("mask_ap_code", {}).get("AP50"), "{:.3f}"), num(hh.get("mask_ap_code", {}).get("AP50_95"), "{:.3f}"),
-            num(ce), num(m.get("latency_gpu", {}).get("mean_s", float("nan")) * 1000, "{:.0f}"),
-            num(m.get("latency_cpu", {}).get("mean_s", float("nan")) * 1000, "{:.0f}")]) + " |")
-    L += ["", "Latency: one image at a time, end-to-end including full-resolution mask post-processing.", ""]
+            num(ce), lat(m.get("latency_gpu")), lat(m.get("latency_cpu"))]) + " |")
+    L += ["", "Latency, one image at a time: *model* = pre-processing + forward pass + the model's own "
+          "post-processing at network resolution (comparable across models); *pipeline* = also full-resolution "
+          "masks, RLE and contours (CPU-bound, the same work for every model).", ""]
 
     for split, mode in [("test", "rig"), ("test_handheld", "handheld")]:
         L += [f"## Camera-decision ppm bins - {mode}", "",
