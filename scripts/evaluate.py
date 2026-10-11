@@ -39,10 +39,7 @@ def make_predictor(name, cfg, device, score_floor, train_dir):
         sys.path.insert(0, str(ROOT / "scripts"))
         from train import rfdetr_class, rfdetr_resolution
         Model = rfdetr_class()
-        model = Model(pretrain_weights=w, resolution=rfdetr_resolution(Model, imgsz))
-        if device == "cpu":
-            model.model.device = "cpu"
-            model.model.model.to("cpu")
+        model = Model(pretrain_weights=w, resolution=rfdetr_resolution(Model, imgsz), device=device)
         return M.RFDETRPredictor(model, {1: "code", 2: "slide"}, device, score_floor, max_det)
     raise ValueError(fam)
 
