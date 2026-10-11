@@ -9,6 +9,7 @@ same seed. The resolved config and environment are saved next to the weights.
 import argparse
 import json
 import math
+import os
 import platform
 import random
 import shutil
@@ -23,6 +24,8 @@ from slideqr.config import dump_config, load_config  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 TRAIN_CFG = ROOT / "configs" / "train.yaml"
+# Ultralytics writes settings to ~/.config, which is not writable on some WSL setups
+os.environ.setdefault("YOLO_CONFIG_DIR", str(ROOT / "runs" / "ultralytics_config"))
 
 
 def seed_all(seed):
@@ -212,6 +215,15 @@ def rfdetr_class():
     raise ImportError("installed rfdetr has no segmentation model")
 
 
+def rfdetr_resolution(model_cls, imgsz):
+    """Largest resolution <= imgsz that the backbone accepts (multiple of
+    patch_size * num_windows; 12 for RF-DETR-Seg Nano, so 1280 -> 1272)."""
+    import rfdetr.config as rc
+    mcfg = getattr(rc, model_cls.__name__ + "Config")()
+    block = int(mcfg.patch_size) * int(mcfg.num_windows)
+    return (int(imgsz) // block) * block
+
+
 def rfdetr_dataset(root):
     """Roboflow-style COCO layout (train/valid/test/*.json next to images) built from
     hard links, so no image is copied."""
@@ -237,7 +249,8 @@ def train_rfdetr(name, cfg, out_dir):
     mc, tc = cfg["models"][name], cfg["train"]
     Model = rfdetr_class()
     ds = rfdetr_dataset(cfg["data_root"])
-    res = int(round(tc["imgsz"] / 32) * 32)
+    res = rfdetr_resolution(Model, tc["imgsz"])
+    print(f"rfdetr: {Model.__name__}, resolution {res}", flush=True)
     model = Model(resolution=res)
     budget = tc["time_budget_min"] * 60.0
     # rfdetr has no wall-clock stop: time one epoch, then train for as many epochs as fit

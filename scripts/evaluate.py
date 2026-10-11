@@ -8,6 +8,7 @@ from SYNTHETIC images.
 import argparse
 import csv
 import json
+import os
 import pickle
 import sys
 from pathlib import Path
@@ -22,10 +23,11 @@ from slideqr.config import load_config  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 SPLITS = {"test": "rig", "test_handheld": "handheld"}
+os.environ.setdefault("YOLO_CONFIG_DIR", str(ROOT / "runs" / "ultralytics_config"))
 
 
-def make_predictor(name, cfg, device, score_floor):
-    summary = json.loads((ROOT / "runs" / "train" / name / "train_summary.json").read_text(encoding="utf-8"))
+def make_predictor(name, cfg, device, score_floor, train_dir):
+    summary = json.loads((Path(train_dir) / name / "train_summary.json").read_text(encoding="utf-8"))
     w = summary["weights"]
     fam = cfg["models"][name]["family"]
     imgsz, max_det = cfg["train"]["imgsz"], cfg["eval"]["max_det"]
@@ -35,8 +37,9 @@ def make_predictor(name, cfg, device, score_floor):
         return M.MaskRCNNPredictor_(w, imgsz, device, score_floor, max_det)
     if fam == "rfdetr":
         sys.path.insert(0, str(ROOT / "scripts"))
-        from train import rfdetr_class
-        model = rfdetr_class()(pretrain_weights=w, resolution=int(round(imgsz / 32) * 32))
+        from train import rfdetr_class, rfdetr_resolution
+        Model = rfdetr_class()
+        model = Model(pretrain_weights=w, resolution=rfdetr_resolution(Model, imgsz))
         if device == "cpu":
             model.model.device = "cpu"
             model.model.model.to("cpu")
@@ -44,9 +47,9 @@ def make_predictor(name, cfg, device, score_floor):
     raise ValueError(fam)
 
 
-def full_image_cache(root, split, coco):
+def full_image_cache(root, split, coco, eval_dir):
     """Model-independent baseline (whole image -> decoder), computed once per split."""
-    path = ROOT / "runs" / "eval" / f"_full_image_{split}.json"
+    path = Path(eval_dir) / f"_full_image_{split}.json"
     if path.exists():
         return {int(k): v for k, v in json.loads(path.read_text(encoding="utf-8")).items()}
     out = {}
@@ -80,16 +83,18 @@ def main():
     ap.add_argument("--config", default=str(ROOT / "configs" / "train.yaml"))
     ap.add_argument("--set", nargs="*", default=[])
     ap.add_argument("--skip-cpu-timing", action="store_true")
+    ap.add_argument("--train-dir", default=str(ROOT / "runs" / "train"))
+    ap.add_argument("--eval-dir", default=str(ROOT / "runs" / "eval"))
     args = ap.parse_args()
     cfg = load_config(args.config, args.set)
     ec = cfg["eval"]
     root = Path(cfg["data_root"])
-    out = ROOT / "runs" / "eval" / args.model
+    out = Path(args.eval_dir) / args.model
     out.mkdir(parents=True, exist_ok=True)
     edges = np.asarray(ec["ppm_bins"], float)
     focus = {k: tuple(v) for k, v in ec["focus_bins"].items()}
 
-    pred = make_predictor(args.model, cfg, "cuda", ec["ap_score_thr"])
+    pred = make_predictor(args.model, cfg, "cuda", ec["ap_score_thr"], args.train_dir)
     metrics = dict(model=args.model, note="SYNTHETIC images only", license=cfg["models"][args.model]["license"],
                    params=int(pred.n_params()), splits={})
     for split, mode in SPLITS.items():
@@ -97,7 +102,7 @@ def main():
         if not ann.exists():
             continue
         coco = COCO(str(ann))
-        full = full_image_cache(root, split, coco)
+        full = full_image_cache(root, split, coco, args.eval_dir)
         tally = EV.Tally(edges, focus)
         results, preds_dump = [], {}
         for iid in sorted(coco.getImgIds()):
@@ -127,10 +132,10 @@ def main():
     coco = COCO(str(ann))
     ids = sorted(coco.getImgIds())
     imgs = [cv2.imread(str(root / "images" / "test" / coco.imgs[i]["file_name"])) for i in ids[: ec["timing_images_gpu"]]]
-    pred_t = make_predictor(args.model, cfg, "cuda", ec["score_thr"])
+    pred_t = make_predictor(args.model, cfg, "cuda", ec["score_thr"], args.train_dir)
     metrics["latency_gpu"] = M.time_predict(pred_t, imgs, device_sync=torch.cuda.synchronize)
     if not args.skip_cpu_timing:
-        pred_c = make_predictor(args.model, cfg, "cpu", ec["score_thr"])
+        pred_c = make_predictor(args.model, cfg, "cpu", ec["score_thr"], args.train_dir)
         metrics["latency_cpu"] = M.time_predict(pred_c, imgs[: ec["timing_images_cpu"]], warmup=1)
     M.save_json(metrics, out / "metrics.json")
     print(json.dumps({k: v for k, v in metrics.items() if k != "splits"}, indent=1))
