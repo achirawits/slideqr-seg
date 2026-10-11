@@ -65,7 +65,7 @@ def coco_ap(coco, results, cat_id):
     from pycocotools.cocoeval import COCOeval
     if not results:
         return dict(AP50=0.0, AP50_95=0.0)
-    dt = coco.loadRes(results)
+    dt = coco.loadRes([dict(r) for r in results])  # loadRes adds keys in place: give it copies
     ev = COCOeval(coco, dt, "segm")
     ev.params.catIds = [cat_id]
     ev.evaluate()

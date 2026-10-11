@@ -40,11 +40,13 @@ def env_info():
     import torch
     info = dict(python=platform.python_version(), platform=platform.platform(), torch=torch.__version__,
                 cuda=torch.version.cuda, gpu=torch.cuda.get_device_name(0) if torch.cuda.is_available() else None)
-    for mod in ("torchvision", "ultralytics", "rfdetr", "pycocotools"):
+    from importlib.metadata import PackageNotFoundError, version
+    for pkg in ("torchvision", "ultralytics", "rfdetr", "pycocotools", "supervision", "transformers",
+                "numpy", "opencv-python", "zxing-cpp"):
         try:
-            info[mod] = __import__(mod).__version__
-        except Exception:  # noqa: BLE001 - optional packages
-            info[mod] = None
+            info[pkg] = version(pkg)
+        except PackageNotFoundError:
+            info[pkg] = None
     return info
 
 
