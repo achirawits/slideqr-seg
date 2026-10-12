@@ -169,6 +169,7 @@ def train_maskrcnn(name, cfg, out_dir):
     done = False
     while not done:
         model.train()
+        it_epoch_start = it
         for imgs, tgts in dl:
             frac = (time.time() - t0) / budget
             if frac >= 1.0:
@@ -189,6 +190,8 @@ def train_maskrcnn(name, cfg, out_dir):
             if it % 50 == 0:
                 print(f"it {it} ep {epoch} loss {loss.item():.4f} lr {lr:.5f} t {time.time() - t0:.0f}s", flush=True)
             it += 1
+        if it == it_epoch_start:
+            break  # budget ran out before this epoch trained anything: nothing new to validate
         # validation counts against the budget, as it does for the other frameworks
         epoch += 1
         model.eval()
