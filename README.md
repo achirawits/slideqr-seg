@@ -7,7 +7,9 @@ labels, predicting the code's 4 corners as a polygon, plus a model comparison.
 > models are tested on real photos. Real photos (`real/`) contain patient sample
 > numbers and are never committed (see `.gitignore`).
 
-Status: Step 1 (synthetic generator) approved. Steps 2-3 (training, evaluation): scripts ready.
+Status: steps 1-3 done on synthetic data - results in `docs/results_synthetic.md`,
+team notes (Thai) in `docs/LEARNING.md`. Step 4 highlight images: `scripts/highlight.py`.
+Not yet tested on real photos.
 
 ## Setup
 

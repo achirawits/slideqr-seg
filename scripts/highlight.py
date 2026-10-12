@@ -48,8 +48,9 @@ def crop_box(coco, iid, W, H, margin=0.08):
     return int(max(0, x0 - mx)), int(max(0, y0 - my)), int(min(W, x1 + mx)), int(min(H, y1 + my))
 
 
-def label(img, text, org, scale):
-    cv2.putText(img, text, org, cv2.FONT_HERSHEY_SIMPLEX, scale, (0, 0, 0), max(2, int(4 * scale)), cv2.LINE_AA)
+def label(img, text, org, scale, outline=True):
+    if outline:  # dark halo for text drawn over the photo (a thicker stroke is also wider)
+        cv2.putText(img, text, org, cv2.FONT_HERSHEY_SIMPLEX, scale, (0, 0, 0), max(2, int(4 * scale)), cv2.LINE_AA)
     cv2.putText(img, text, org, cv2.FONT_HERSHEY_SIMPLEX, scale, (255, 255, 255), max(1, int(1.5 * scale)), cv2.LINE_AA)
 
 
@@ -86,12 +87,12 @@ def compose(img, mask_panel, over, texts, title, box):
     row = cv2.resize(row, (target_w, int(row.shape[0] * target_w / row.shape[1])), interpolation=cv2.INTER_AREA)
     lines = max(1, (len(texts) + 2) // 3)
     footer = np.full((80 + 50 * lines, target_w, 3), 25, np.uint8)
-    label(footer, title, (12, 50), 1.3)
+    label(footer, title, (12, 50), 1.3, outline=False)
     for i, (col, t) in enumerate(texts):
         x = 12 + (i % 3) * (target_w // 3)
         y = 110 + 50 * (i // 3)
         cv2.rectangle(footer, (x, y - 28), (x + 32, y + 4), tuple(int(c) for c in col), -1)
-        label(footer, t, (x + 42, y), 1.05)
+        label(footer, t, (x + 42, y), 1.05, outline=False)
     return np.vstack([row, footer])
 
 
