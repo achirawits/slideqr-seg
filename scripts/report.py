@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from slideqr.evaluation import METHODS  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-ORDER = ["maskrcnn", "yolo11n", "yolo26n", "rfdetr"]
+ORDER = ["maskrcnn", "yolo11n", "yolo26n", "rfdetr", "oracle"]  # oracle = ground-truth corners
 LABEL = {"full_image": "full image", "bbox_crop": "axis-aligned crop", "quad_warp": "4-corner warp"}
 
 
@@ -41,13 +41,21 @@ def main():
     if not runs:
         raise SystemExit("no metrics found under runs/eval")
     L = ["# Model comparison - SYNTHETIC test images only", "",
-         "All numbers come from synthetic renders; they are not real-photo results.", ""]
+         "All numbers come from synthetic renders; they are not real-photo results.", "",
+         "* Same split, input long side 1280 (RF-DETR 1272), 60 min wall-clock training budget each, seed 0.",
+         "* RF-DETR-Seg Nano runs ~25 min per epoch at 1272 px, so it got only 2 epochs in the budget; "
+         "its numbers reflect the equal-time rule, not a converged model.",
+         "* Decoder for all three inputs: zxing-cpp, LocalAverage binarizer with GlobalHistogram fallback.",
+         "* **oracle** = ground-truth corners pushed through the same scoring: the ceiling for each ppm bin "
+         "(and, in the corner-error column, the floor of the mask -> quad conversion).", ""]
 
     L += ["## Summary", "",
           "| model | params (M) | license | rig AP50 | rig AP50:95 | handheld AP50 | handheld AP50:95 | "
           "rig corner err (px, median) | GPU ms/img model / pipeline | CPU ms/img model / pipeline |",
           "|" + "---|" * 10]
     for n, m in runs.items():
+        if n == "oracle":
+            continue
         s = m["splits"]
         rig, hh = s.get("test", {}), s.get("test_handheld", {})
         ce = next((r["corner_err_px_median"] for r in rig.get("per_bin", []) if r["bin"] == "all"), None)

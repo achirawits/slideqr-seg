@@ -88,8 +88,25 @@ def match(preds, gts, h, w, iou_thr):
 
 # ---------------------------------------------------------------- decoding
 
+# zxing's default LocalAverage binarizer uses a fixed local window: when modules are
+# larger than it (high ppm, tight crops) they come out hollow and the read fails.
+# GlobalHistogram is tried as a fallback. All three decoder inputs use the same reader.
+BINARIZERS = (zxingcpp.Binarizer.LocalAverage, zxingcpp.Binarizer.GlobalHistogram)
+
+
+def zx_read(img, first_only):
+    texts = []
+    for b in BINARIZERS:
+        for r in zxingcpp.read_barcodes(img, formats=ZX_ALL, binarizer=b):
+            if r.text not in texts:
+                texts.append(r.text)
+        if texts and first_only:
+            break
+    return texts
+
+
 def decode_full(img):
-    return [r.text for r in zxingcpp.read_barcodes(img, formats=ZX_ALL)]
+    return zx_read(img, first_only=False)
 
 
 def decode_bbox_crop(img, poly, margin_frac):
@@ -101,15 +118,15 @@ def decode_bbox_crop(img, poly, margin_frac):
     xb, yb = int(min(W, np.ceil(x1 + mx))), int(min(H, np.ceil(y1 + my)))
     if xb - xa < 4 or yb - ya < 4:
         return None
-    res = zxingcpp.read_barcodes(np.ascontiguousarray(img[ya:yb, xa:xb]), formats=ZX_ALL)
-    return res[0].text if res else None
+    res = zx_read(np.ascontiguousarray(img[ya:yb, xa:xb]), first_only=True)
+    return res[0] if res else None
 
 
 def decode_quad_warp(img, quad, px_per_module, nominal_modules=20):
     """Rectify the predicted quad to a square (modules unknown -> nominal size)."""
     patch = C.rectify(img, quad, nominal_modules, px_per_module, 3)
-    res = zxingcpp.read_barcodes(patch, formats=ZX_ALL)
-    return res[0].text if res else None
+    res = zx_read(patch, first_only=True)
+    return res[0] if res else None
 
 
 # ---------------------------------------------------------------- aggregation
