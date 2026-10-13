@@ -278,3 +278,7 @@ Read rate = share of codes decoded correctly; wrong = decoded text that is not t
 | 8MP on PLA base [3.5,4) | 267 | 100.0% | 0.50 / 0.40 | 59.2% / 0 | 74.2% / 0 | 80.1% / 0 | 82.8% / 0 |
 | 12MP on PLA base [4.5,5) | 245 | 100.0% | 0.62 / 0.40 | 66.9% / 0 | 89.0% / 0 | 93.9% / 0 | 97.1% / 0 |
 
+## Wrong-read audit
+
+`scripts/audit_wrong_reads.py`: **0 wrong read(s)** over all models, both test sets and every decoder input. A read is judged against the code physically under the prediction; see `docs/wrong_read_audit.md` for the rule and the one case found in the first report.
+
