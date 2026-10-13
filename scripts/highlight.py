@@ -22,7 +22,7 @@ from slideqr import evaluation as EV  # noqa: E402
 from slideqr.config import load_config  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-ORDER = ["maskrcnn", "yolo11n", "yolo26n", "rfdetr"]
+ORDER = ["maskrcnn", "yolo11n", "yolo26n", "rfdetr", "rfdetr_long"]  # rfdetr_long = supplementary run
 PALETTE = [(230, 159, 0), (86, 180, 233), (0, 158, 115), (240, 228, 66), (0, 114, 178),
            (213, 94, 0), (204, 121, 167), (255, 255, 255), (120, 200, 255), (200, 120, 255)]  # BGR-ish, distinct
 
