@@ -275,6 +275,16 @@ def train_rfdetr(name, cfg, out_dir):
     budget = tc["time_budget_min"] * 60.0
     kw = dict(batch_size=mc["batch"], grad_accum_steps=mc["grad_accum"], lr=mc["lr"], seed=cfg["seed"],
               num_workers=tc["workers"])
+    if mc.get("epochs"):
+        # Supplementary run OUTSIDE the equal-time rule: fixed epoch cap, stop when the
+        # validation metric stops improving.
+        print(f"rfdetr: supplementary run, up to {mc['epochs']} epochs, early stopping "
+              f"patience {mc['early_stopping_patience']} (no time budget)", flush=True)
+        Model(resolution=res).train(dataset_dir=str(rfdetr_dataset(cfg["data_root"])), epochs=int(mc["epochs"]),
+                                    output_dir=str(out_dir), early_stopping=True,
+                                    early_stopping_patience=int(mc["early_stopping_patience"]),
+                                    early_stopping_min_delta=float(mc["early_stopping_min_delta"]), **kw)
+        return _rfdetr_checkpoint(out_dir)
     # The LR schedule follows `epochs`, so estimate how many epochs fit the budget, then let
     # Lightning's max_time stop the real run exactly at the budget. Two 1-epoch pilots on
     # 1/40 and 1/20 of train/val (not counted in the budget): time = startup + f * epoch,
@@ -297,6 +307,10 @@ def train_rfdetr(name, cfg, out_dir):
         Model(resolution=res).train(dataset_dir=str(ds), epochs=epochs, output_dir=str(out_dir), **kw)
     finally:
         rt.build_trainer = orig
+    return _rfdetr_checkpoint(out_dir)
+
+
+def _rfdetr_checkpoint(out_dir):
     for cand in ("checkpoint_best_total.pth", "checkpoint_best_ema.pth", "checkpoint_best_regular.pth", "checkpoint.pth"):
         if (out_dir / cand).exists():
             return out_dir / cand

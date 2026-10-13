@@ -38,6 +38,20 @@ models:
     lr: 0.0001
     license: "check installed rfdetr version (code Apache-2.0; see model card for weights)"
 
+  # Supplementary experiment, OUTSIDE the equal-time rule: RF-DETR trained until the
+  # validation metric stops improving (the 60-min run only fits 2 epochs).
+  rfdetr_long:
+    family: rfdetr
+    size: smallest
+    batch: 1
+    grad_accum: 8
+    lr: 0.0001
+    epochs: 30                    # cap (~25 min/epoch at 1272 px on an RTX 5070)
+    early_stopping_patience: 5
+    early_stopping_min_delta: 0.001
+    supplementary: true
+    license: "see README: RF-DETR licence check"
+
 eval:
   score_thr: 0.5                  # detections used for decoding / corner error
   ap_score_thr: 0.001             # detections kept for COCO AP
