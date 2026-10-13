@@ -161,6 +161,7 @@ def main():
     ap.add_argument("--rescore", action="store_true",
                     help="recompute decoding / corner metrics from saved predictions (no model run); "
                          "AP and latency are kept from metrics.json")
+    ap.add_argument("--timing-only", action="store_true", help="re-measure latency only (idle GPU)")
     args = ap.parse_args()
     cfg = load_config(args.config, args.set)
     ec = cfg["eval"]
@@ -174,6 +175,12 @@ def main():
         return
     if args.rescore:
         rescore(args, cfg, root, out, edges, focus)
+        return
+    if args.timing_only:
+        metrics = json.loads((out / "metrics.json").read_text(encoding="utf-8"))
+        metrics.update(timing(args, cfg, root))
+        M.save_json(metrics, out / "metrics.json")
+        print(args.model, metrics["latency_gpu"], metrics.get("latency_cpu"))
         return
 
     pred = make_predictor(args.model, cfg, "cuda", ec["ap_score_thr"], args.train_dir)
@@ -206,19 +213,27 @@ def main():
                                         mask_ap_code=coco_ap(coco, results, 1),
                                         mask_ap_slide=coco_ap(coco, results, 2), per_bin=rows)
 
-    # latency: one image at a time, end-to-end incl. full-resolution mask post-processing
-    ann = root / "annotations" / "instances_test.json"
-    coco = COCO(str(ann))
-    ids = sorted(coco.getImgIds())
-    imgs = [cv2.imread(str(root / "images" / "test" / coco.imgs[i]["file_name"])) for i in ids[: ec["timing_images_gpu"]]]
-    pred_t = make_predictor(args.model, cfg, "cuda", ec["score_thr"], args.train_dir)
     metrics["decoder"] = "zxing-cpp, binarizers LocalAverage then GlobalHistogram"
-    metrics["latency_gpu"] = M.time_predict(pred_t, imgs, device_sync=torch.cuda.synchronize)
-    if not args.skip_cpu_timing:
-        pred_c = make_predictor(args.model, cfg, "cpu", ec["score_thr"], args.train_dir)
-        metrics["latency_cpu"] = M.time_predict(pred_c, imgs[: ec["timing_images_cpu"]], warmup=1)
+    metrics.update(timing(args, cfg, root))
     M.save_json(metrics, out / "metrics.json")
     print(json.dumps({k: v for k, v in metrics.items() if k != "splits"}, indent=1))
+
+
+def timing(args, cfg, root):
+    """Latency, one image at a time (model alone and full pipeline). Run it on an idle
+    GPU: other programs using the GPU (e.g. games) inflate the numbers."""
+    from pycocotools.coco import COCO
+    import torch
+    ec = cfg["eval"]
+    coco = COCO(str(root / "annotations" / "instances_test.json"))
+    ids = sorted(coco.getImgIds())
+    imgs = [cv2.imread(str(root / "images" / "test" / coco.imgs[i]["file_name"])) for i in ids[: ec["timing_images_gpu"]]]
+    out = dict(latency_gpu=M.time_predict(make_predictor(args.model, cfg, "cuda", ec["score_thr"], args.train_dir),
+                                          imgs, device_sync=torch.cuda.synchronize))
+    if not args.skip_cpu_timing:
+        out["latency_cpu"] = M.time_predict(make_predictor(args.model, cfg, "cpu", ec["score_thr"], args.train_dir),
+                                            imgs[: ec["timing_images_cpu"]], warmup=1)
+    return out
 
 
 if __name__ == "__main__":

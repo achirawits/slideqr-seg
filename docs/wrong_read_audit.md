@@ -31,11 +31,28 @@ this correct read was counted twice against the model: once as a missed code and
 as a wrong read.
 
 **Fix in the scoring (commit 322a0ac).** A decoded text is now judged against the code
-that physically lies under the prediction (the code covering at least 50% of the
-predicted mask). It is a wrong read only if it differs from that code's payload or if
-no code lies under the prediction. Detection rate and corner error still use the
-IoU >= 0.5 match. With this rule the case counts as a correct read of
-`S67-59588 G 5A`.
+that physically lies under the prediction. It is a wrong read only if it differs from
+that code's payload or if no code lies under the prediction. Detection rate and corner
+error still use the IoU >= 0.5 match. With this rule the case counts as a correct read
+of `S67-59588 G 5A`.
+
+## Second case (supplementary rfdetr_long), the mirror image of the first
+
+| field | value |
+|---|---|
+| image | `test_handheld/handheld_000042.jpg` (handheld, 9 codes) |
+| model | rfdetr_long (supplementary run) |
+| decoder input | axis-aligned crop |
+| prediction | score 0.68, mask 2,165 px - **too big**: the true code is 1,254 px (1.97 ppm, far side of the oblique view) |
+| text read | `S64-22790 D 1A` = the payload of the code under the mask |
+| overlap | 49% of the mask lies on that code (the code itself is almost fully covered) |
+
+The first rule ("the code must cover >= 50% of the predicted mask") handled masks that
+are too small but not masks that are too big. **Final rule (current):** the owner is
+the code with the largest overlap, kept if the overlap covers at least 50% of the
+*smaller* of the two areas (mask or code). A read is wrong if it is not the owner's
+payload or if there is no owner. Under this rule both cases are correct reads of the
+code under the prediction.
 
 **What would have made it a real danger.** A read of *another* slide's payload from
 under a prediction, or a text found on no label. The audit reports both kinds

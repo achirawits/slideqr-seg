@@ -68,20 +68,22 @@ def gt_instances(coco, image_id, cat_id):
     return anns
 
 
-def owners(preds, gts, h, w, inside_thr=0.5):
-    """For each prediction, the code physically under it: the ground truth that covers at
-    least `inside_thr` of the predicted mask area (None otherwise). Decoded text is judged
-    against this code, so a poor but well-placed mask that reads the code beneath it is
-    not counted as a wrong read."""
+def owners(preds, gts, h, w, overlap_thr=0.5):
+    """For each prediction, the code physically under it: the ground truth with the
+    largest overlap, kept if the overlap covers at least `overlap_thr` of the SMALLER of
+    the two areas (handles masks that are too small and masks that are too big). Decoded
+    text is judged against this code, so a poorly shaped but well-placed mask that reads
+    the code beneath it is not counted as a wrong read; reading any other code is."""
     if not preds or not gts:
         return [None] * len(preds)
     g_rle = [mask_utils.merge(mask_utils.frPyObjects(g["segmentation"], h, w)) for g in gts]
+    g_area = [max(float(mask_utils.area(g)), 1.0) for g in g_rle]
     out = []
     for p in preds:
-        area = max(float(mask_utils.area(p["rle"])), 1.0)
-        inside = [float(mask_utils.area(mask_utils.merge([p["rle"], g], intersect=True))) / area for g in g_rle]
-        j = int(np.argmax(inside))
-        out.append(j if inside[j] >= inside_thr else None)
+        p_area = max(float(mask_utils.area(p["rle"])), 1.0)
+        inter = [float(mask_utils.area(mask_utils.merge([p["rle"], g], intersect=True))) for g in g_rle]
+        j = int(np.argmax(inter))
+        out.append(j if inter[j] / min(p_area, g_area[j]) >= overlap_thr else None)
     return out
 
 

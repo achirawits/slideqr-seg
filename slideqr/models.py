@@ -20,7 +20,8 @@ def long_side_scale(w, h, imgsz):
 
 
 def area_resize_long(img, imgsz):
-    """Every model gets the same antialiased (INTER_AREA) downscale to its input size."""
+    """Antialiased (INTER_AREA) downscale to the network input size (Mask R-CNN; RF-DETR
+    uses the square variant). YOLO keeps its native pipeline, see YoloPredictor.infer."""
     H, W = img.shape[:2]
     s = long_side_scale(W, H, imgsz)
     if s >= 1:
@@ -100,13 +101,17 @@ class YoloPredictor:
         self.imgsz, self.device, self.score_floor, self.max_det = imgsz, device, score_floor, max_det
 
     def infer(self, img_bgr, retina=False):
-        """Area-downscale to the network size, then letterbox + forward + NMS + masks."""
-        small = area_resize_long(img_bgr, self.imgsz)
-        return self.model.predict(small, imgsz=self.imgsz, conf=self.score_floor, max_det=self.max_det,
+        """Ultralytics' own pipeline on the full image: letterbox, forward, NMS, masks.
+
+        Kept native on purpose: with retina_masks the mask logits are upsampled to the
+        original resolution, which gives the sharpest boundary. An INTER_AREA pre-resize
+        was tried and made the masks coarser (corner error 1.5 -> 2.4 px) while YOLO had
+        no aliasing failure to fix (0 test images without a code prediction)."""
+        return self.model.predict(img_bgr, imgsz=self.imgsz, conf=self.score_floor, max_det=self.max_det,
                                   retina_masks=retina, device=self.device, verbose=False)[0]
 
     def predict(self, img_bgr):
-        r = self.infer(img_bgr, retina=True)            # masks at the size of the downscaled input
+        r = self.infer(img_bgr, retina=True)            # masks at the original image size
         if r.masks is None:
             return []
         H, W = img_bgr.shape[:2]
