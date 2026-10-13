@@ -16,7 +16,7 @@ All numbers come from synthetic renders; they are not real-photo results.
 | maskrcnn | 43.9 | BSD-3-Clause (torchvision code); COCO-pretrained weights | 1.000 | 0.846 | 0.990 | 0.790 | 2.14 | 53 / 123 | 666 / 791 |
 | yolo11n | 2.9 | AGPL-3.0 (Ultralytics) or Ultralytics Enterprise License | 1.000 | 0.918 | 0.980 | 0.700 | 1.54 | 7 / 94 | 40 / 156 |
 | yolo26n | 3.1 | AGPL-3.0 (Ultralytics) or Ultralytics Enterprise License | 1.000 | 0.919 | 0.990 | 0.688 | 1.48 | 8 / 94 | 40 / 154 |
-| rfdetr | 37.3 | check installed rfdetr version (code Apache-2.0; see model card for weights) | 0.990 | 0.899 | 0.990 | 0.867 | 2.83 | 294 / 340 | 2967 / 2994 |
+| rfdetr | 37.3 | Apache-2.0 (rfdetr code and RF-DETR-Seg Nano weights; README checked 2026-10-13) | 0.990 | 0.899 | 0.990 | 0.867 | 2.83 | 294 / 340 | 2967 / 2994 |
 
 Latency, one image at a time: *model* = pre-processing + forward pass + the model's own post-processing at network resolution (comparable across models); *pipeline* = also full-resolution masks, RLE and contours (CPU-bound, the same work for every model).
 
@@ -123,8 +123,8 @@ Read rate = share of codes decoded correctly; wrong = decoded text that is not t
 
 | bin | codes | detected | corner err mean / median px | full image read / wrong | axis-aligned crop read / wrong | 4-corner warp read / wrong | warp, then crop if no read read / wrong |
 |---|---|---|---|---|---|---|---|
-| all | 2029 | 97.9% | 3.07 / 2.83 | 80.7% / 0 | 86.8% / 1 | 58.5% / 0 | 90.6% / 1 |
-| [2,2.5) | 205 | 84.9% | 3.51 / 3.16 | 70.7% / 0 | 58.5% / 1 | 2.0% / 0 | 58.5% / 1 |
+| all | 2029 | 97.9% | 3.07 / 2.83 | 80.7% / 0 | 86.8% / 0 | 58.5% / 0 | 90.6% / 0 |
+| [2,2.5) | 205 | 84.9% | 3.51 / 3.16 | 70.7% / 0 | 59.0% / 0 | 2.0% / 0 | 59.0% / 0 |
 | [2.5,3) | 172 | 95.3% | 3.22 / 3.11 | 70.9% / 0 | 76.7% / 0 | 9.9% / 0 | 76.7% / 0 |
 | [3,3.5) | 178 | 98.9% | 3.02 / 2.91 | 73.6% / 0 | 92.1% / 0 | 17.4% / 0 | 92.1% / 0 |
 | [3.5,4) | 209 | 100.0% | 2.75 / 2.70 | 64.1% / 0 | 87.6% / 0 | 40.2% / 0 | 90.0% / 0 |

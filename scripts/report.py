@@ -100,6 +100,18 @@ def main():
                                             f"{num(r['corner_err_px_mean'])} / {num(r['corner_err_px_median'])}"] +
                                            [f"{pct(r[f'{k}_read_rate'])} / {r[f'{k}_wrong_reads']}" for k in METHODS]) + " |")
             L.append("")
+    audit = ROOT / "runs" / "wrong_reads" / "wrong_reads.json"
+    if audit.exists():
+        cases = json.loads(audit.read_text(encoding="utf-8"))
+        L += ["## Wrong-read audit", "",
+              f"`scripts/audit_wrong_reads.py`: **{len(cases)} wrong read(s)** over all models, both test sets "
+              "and every decoder input. A read is judged against the code physically under the prediction; "
+              "see `docs/wrong_read_audit.md` for the rule and the one case found in the first report.", ""]
+        if cases:
+            L += ["| split | image | model | method | truth | read | kind |", "|---|---|---|---|---|---|---|"]
+            L += [f"| {c['split']} | {c['image']} | {c['model']} | {c['method']} | {c['truth']} | {c['read']} | {c['kind']} |"
+                  for c in cases]
+            L.append("")
     out = ROOT / args.out
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(L) + "\n", encoding="utf-8")
