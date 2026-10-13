@@ -68,6 +68,23 @@ def gt_instances(coco, image_id, cat_id):
     return anns
 
 
+def owners(preds, gts, h, w, inside_thr=0.5):
+    """For each prediction, the code physically under it: the ground truth that covers at
+    least `inside_thr` of the predicted mask area (None otherwise). Decoded text is judged
+    against this code, so a poor but well-placed mask that reads the code beneath it is
+    not counted as a wrong read."""
+    if not preds or not gts:
+        return [None] * len(preds)
+    g_rle = [mask_utils.merge(mask_utils.frPyObjects(g["segmentation"], h, w)) for g in gts]
+    out = []
+    for p in preds:
+        area = max(float(mask_utils.area(p["rle"])), 1.0)
+        inside = [float(mask_utils.area(mask_utils.merge([p["rle"], g], intersect=True))) / area for g in g_rle]
+        j = int(np.argmax(inside))
+        out.append(j if inside[j] >= inside_thr else None)
+    return out
+
+
 def match(preds, gts, h, w, iou_thr):
     """Greedy one-to-one matching by mask IoU (preds sorted by score).
     Returns dict pred_index -> gt_index."""
@@ -213,7 +230,9 @@ def evaluate_image(img, gts_code, preds, cfg_eval, tally, full_texts=None):
         if t not in payloads:
             tally.add(_nearest_ppm(scored), "full_image_wrong")
 
-    # methods 2 and 3: per predicted instance
+    # per predicted instance. Detection and corner error use the IoU match; a decoded
+    # text is judged against the code physically under the prediction (owners()).
+    own = owners(preds, gts_code, H, W)
     hit = {m: set() for m in METHODS if m != "full_image"}
     for i, p in enumerate(preds):
         j = m.get(i)
@@ -224,16 +243,17 @@ def evaluate_image(img, gts_code, preds, cfg_eval, tally, full_texts=None):
             if quad is not None:
                 tally.add_corner(g["ppm"], corner_error(quad, g["corners"]))
         reads = decode_all(img, p["poly"], quad, cfg_eval)
-        ppm = g["ppm"] if g is not None else _nearest_ppm(scored)
+        o = gts_code[own[i]] if own[i] is not None else None
+        ppm = o["ppm"] if o is not None else _nearest_ppm(scored)
         for meth, text in reads.items():
             if text is None:
                 continue
-            if g is not None and text == g["payload"]:
-                if j not in hit[meth]:
-                    hit[meth].add(j)
+            if o is not None and text == o["payload"]:
+                if not o["iscrowd"] and o["id"] not in hit[meth]:   # ignored codes are not scored
+                    hit[meth].add(o["id"])
                     tally.add(ppm, f"{meth}_ok")
             else:
-                tally.add(ppm, f"{meth}_wrong")  # wrong code read, or a read with no matching code
+                tally.add(ppm, f"{meth}_wrong")  # not the code under the prediction, or no code under it
     return texts
 
 

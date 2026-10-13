@@ -82,20 +82,25 @@ def main():
                 H, W = img.shape[:2]
                 scored = [g for g in gts_all if not g["iscrowd"]]
                 match = EV.match(ps, scored, H, W, ec["iou_match"])
+                own = EV.owners(ps, gts_all, H, W)   # same rule as evaluate_image
                 for i, p in enumerate(ps):
                     quad = EV.poly_to_quad(p["poly"])
                     reads = EV.decode_all(img, p["poly"], quad, ec)
-                    g = scored[match[i]] if i in match else None
+                    g = gts_all[own[i]] if own[i] is not None else None
                     for meth, text in reads.items():
                         if text is None or (g is not None and text == g["payload"]):
                             continue
                         other = payloads.get(text)
-                        kind = ("payload of ANOTHER code in the image (wrong slide)" if other is not None
-                                else "text not on any label in the image (misdecode)")
+                        if g is None:
+                            kind = "no code under the prediction"
+                        elif other is not None:
+                            kind = "payload of ANOTHER code in the image (wrong slide)"
+                        else:
+                            kind = "text not on any label in the image (misdecode)"
                         k = len(cases)
                         rec = dict(id=k, split=split, image=info["file_name"], model=m, method=meth, score=p["score"],
                                    read=text, truth=g["payload"] if g else None, kind=kind,
-                                   matched=g is not None, ppm=g["ppm"] if g else None,
+                                   iou_matched=i in match, ppm=g["ppm"] if g else None,
                                    corner_err_px=EV.corner_error(quad, g["corners"]) if (g and quad is not None) else None,
                                    visible_frac=g.get("visible_frac") if g else None)
                         ref = g or other
