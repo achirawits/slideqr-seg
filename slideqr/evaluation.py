@@ -14,7 +14,7 @@ from pycocotools import mask as mask_utils
 from . import codes as C
 
 ZX_ALL = zxingcpp.BarcodeFormat.DataMatrix | zxingcpp.BarcodeFormat.QRCode
-METHODS = ["full_image", "bbox_crop", "quad_warp"]
+METHODS = ["full_image", "bbox_crop", "quad_warp", "warp_then_crop"]
 
 
 # ---------------------------------------------------------------- geometry
@@ -129,6 +129,14 @@ def decode_quad_warp(img, quad, px_per_module, nominal_modules=20):
     return res[0] if res else None
 
 
+def decode_all(img, poly, quad, cfg_eval):
+    """Per-instance decoder inputs. warp_then_crop = 4-corner warp first, the
+    axis-aligned crop only when the warp gives no read."""
+    crop = decode_bbox_crop(img, poly, cfg_eval["crop_margin_frac"]) if poly is not None else None
+    warp = decode_quad_warp(img, quad, cfg_eval["rectify_px_per_module"]) if quad is not None else None
+    return {"bbox_crop": crop, "quad_warp": warp, "warp_then_crop": warp if warp is not None else crop}
+
+
 # ---------------------------------------------------------------- aggregation
 
 def ppm_bin(ppm, edges):
@@ -206,7 +214,7 @@ def evaluate_image(img, gts_code, preds, cfg_eval, tally, full_texts=None):
             tally.add(_nearest_ppm(scored), "full_image_wrong")
 
     # methods 2 and 3: per predicted instance
-    hit = {"bbox_crop": set(), "quad_warp": set()}
+    hit = {m: set() for m in METHODS if m != "full_image"}
     for i, p in enumerate(preds):
         j = m.get(i)
         g = scored[j] if j is not None else None
@@ -215,10 +223,7 @@ def evaluate_image(img, gts_code, preds, cfg_eval, tally, full_texts=None):
             tally.add(g["ppm"], "detected")
             if quad is not None:
                 tally.add_corner(g["ppm"], corner_error(quad, g["corners"]))
-        reads = {
-            "bbox_crop": decode_bbox_crop(img, p["poly"], cfg_eval["crop_margin_frac"]) if p["poly"] is not None else None,
-            "quad_warp": decode_quad_warp(img, quad, cfg_eval["rectify_px_per_module"]) if quad is not None else None,
-        }
+        reads = decode_all(img, p["poly"], quad, cfg_eval)
         ppm = g["ppm"] if g is not None else _nearest_ppm(scored)
         for meth, text in reads.items():
             if text is None:

@@ -11,8 +11,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from slideqr.evaluation import METHODS  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-ORDER = ["maskrcnn", "yolo11n", "yolo26n", "rfdetr", "oracle"]  # oracle = ground-truth corners
-LABEL = {"full_image": "full image", "bbox_crop": "axis-aligned crop", "quad_warp": "4-corner warp"}
+ORDER = ["maskrcnn", "yolo11n", "yolo26n", "rfdetr", "rfdetr_long", "oracle"]  # oracle = ground-truth corners
+DISPLAY = {"rfdetr_long": "rfdetr_long (SUPPLEMENTARY: no time budget)"}
+LABEL = {"full_image": "full image", "bbox_crop": "axis-aligned crop", "quad_warp": "4-corner warp",
+         "warp_then_crop": "warp, then crop if no read"}
 
 
 def pct(x):
@@ -45,6 +47,9 @@ def main():
          "* Same split, input long side 1280 (RF-DETR 1272), 60 min wall-clock training budget each, seed 0.",
          "* RF-DETR-Seg Nano runs ~25 min per epoch at 1272 px, so it got only 2 epochs in the budget; "
          "its numbers reflect the equal-time rule, not a converged model.",
+         "* **rfdetr_long** is a SUPPLEMENTARY run OUTSIDE the equal-time rule (up to 30 epochs, early "
+         "stopping on validation); compare it with the others only as \"what RF-DETR reaches when trained longer\".",
+         "* warp, then crop = 4-corner warp first, axis-aligned crop only when the warp gives no read.",
          "* Decoder for all three inputs: zxing-cpp, LocalAverage binarizer with GlobalHistogram fallback.",
          "* **oracle** = ground-truth corners pushed through the same scoring: the ceiling for each ppm bin "
          "(and, in the corner-error column, the floor of the mask -> quad conversion).", ""]
@@ -60,7 +65,7 @@ def main():
         rig, hh = s.get("test", {}), s.get("test_handheld", {})
         ce = next((r["corner_err_px_median"] for r in rig.get("per_bin", []) if r["bin"] == "all"), None)
         L.append("| " + " | ".join([
-            n, num(m["params"] / 1e6, "{:.1f}"), m["license"],
+            DISPLAY.get(n, n), num(m["params"] / 1e6, "{:.1f}"), m["license"],
             num(rig.get("mask_ap_code", {}).get("AP50"), "{:.3f}"), num(rig.get("mask_ap_code", {}).get("AP50_95"), "{:.3f}"),
             num(hh.get("mask_ap_code", {}).get("AP50"), "{:.3f}"), num(hh.get("mask_ap_code", {}).get("AP50_95"), "{:.3f}"),
             num(ce), lat(m.get("latency_gpu")), lat(m.get("latency_cpu"))]) + " |")
@@ -77,7 +82,7 @@ def main():
             for r in m["splits"].get(split, {}).get("per_bin", []):
                 if r["bin"] == "all" or r["bin"].startswith("["):
                     continue  # named camera-decision bins only
-                L.append("| " + " | ".join([n, r["bin"], str(r["n_codes"]), pct(r["detected"]),
+                L.append("| " + " | ".join([DISPLAY.get(n, n), r["bin"], str(r["n_codes"]), pct(r["detected"]),
                                             num(r["corner_err_px_median"])] +
                                            [f"{pct(r[f'{k}_read_rate'])} / {r[f'{k}_wrong_reads']}" for k in METHODS]) + " |")
         L.append("")
@@ -88,7 +93,7 @@ def main():
             rows = m["splits"].get(split, {}).get("per_bin", [])
             if not rows:
                 continue
-            L += [f"### {n}", "", "| bin | codes | detected | corner err mean / median px | " +
+            L += [f"### {DISPLAY.get(n, n)}", "", "| bin | codes | detected | corner err mean / median px | " +
                   " | ".join(f"{LABEL[k]} read / wrong" for k in METHODS) + " |", "|" + "---|" * (4 + len(METHODS))]
             for r in rows:
                 L.append("| " + " | ".join([r["bin"], str(r["n_codes"]), pct(r["detected"]),
