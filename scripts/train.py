@@ -278,12 +278,17 @@ def train_rfdetr(name, cfg, out_dir):
     if mc.get("epochs"):
         # Supplementary run OUTSIDE the equal-time rule: fixed epoch cap, stop when the
         # validation metric stops improving.
+        resume = mc.get("resume")
+        if resume and not Path(resume).exists():
+            raise FileNotFoundError(f"resume checkpoint {resume} not found")
         print(f"rfdetr: supplementary run, up to {mc['epochs']} epochs, early stopping "
-              f"patience {mc['early_stopping_patience']} (no time budget)", flush=True)
+              f"patience {mc['early_stopping_patience']} (no time budget)"
+              + (f", resuming from {resume}" if resume else ""), flush=True)
         Model(resolution=res).train(dataset_dir=str(rfdetr_dataset(cfg["data_root"])), epochs=int(mc["epochs"]),
                                     output_dir=str(out_dir), early_stopping=True,
                                     early_stopping_patience=int(mc["early_stopping_patience"]),
-                                    early_stopping_min_delta=float(mc["early_stopping_min_delta"]), **kw)
+                                    early_stopping_min_delta=float(mc["early_stopping_min_delta"]),
+                                    **({"resume": str(resume)} if resume else {}), **kw)
         return _rfdetr_checkpoint(out_dir)
     # The LR schedule follows `epochs`, so estimate how many epochs fit the budget, then let
     # Lightning's max_time stop the real run exactly at the budget. Two 1-epoch pilots on

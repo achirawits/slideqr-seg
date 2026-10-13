@@ -49,6 +49,7 @@ models:
     epochs: 30                    # cap (~25 min/epoch at 1272 px on an RTX 5070)
     early_stopping_patience: 5
     early_stopping_min_delta: 0.001
+    resume: null                  # e.g. runs/train/rfdetr_long/last.ckpt to continue after a pause
     supplementary: true
     license: "Apache-2.0 (rfdetr code and RF-DETR-Seg Nano weights; README checked 2026-10-13)"
 
