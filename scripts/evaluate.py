@@ -92,6 +92,7 @@ def rescore(args, cfg, root, out, edges, focus):
         write_rows(out / f"per_bin_{split}.csv", rows)
         metrics["splits"][split]["per_bin"] = rows
     metrics["decoder"] = "zxing-cpp, binarizers LocalAverage then GlobalHistogram"
+    metrics["license"] = cfg["models"][args.model]["license"]   # keep in step with the config
     M.save_json(metrics, out / "metrics.json")
     print("rescored", args.model)
 

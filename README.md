@@ -50,6 +50,19 @@ The reference dataset is generated on Ubuntu 24.04 (WSL2). On another OS, point
 closely but are not guaranteed bit-identical (OpenCV/JPEG builds differ), so train
 and test on data generated on one platform.
 
+## Licences of the compared models
+
+| model | code | pretrained weights | source checked |
+|---|---|---|---|
+| Mask R-CNN R50-FPN | BSD-3-Clause (torchvision) | COCO-pretrained, distributed by torchvision | torchvision |
+| YOLO11n-seg, YOLO26n-seg | AGPL-3.0 or Ultralytics Enterprise License | same terms as the code | Ultralytics |
+| RF-DETR-Seg Nano | Apache-2.0 (`rfdetr`) | **Apache-2.0** - the official README lists every RF-DETR-Seg size (Nano to 2XLarge) as Apache 2.0 | github.com/roboflow/rf-detr, 2026-10-13 |
+
+Under the same README, only some *detection* sizes (Atto, Femto, Pico, XL, 2XL) and the
+`rfdetr_plus` extension are under PML 1.0; none of them is used here. AGPL-3.0 matters if
+the YOLO-based system is distributed or offered as a network service: the full source
+must then be released under AGPL, or an Ultralytics licence bought.
+
 ## Library versions used (WSL2 Ubuntu 24.04, RTX 5070)
 
 | package | version |

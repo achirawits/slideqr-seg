@@ -36,7 +36,7 @@ models:
     batch: 1
     grad_accum: 8
     lr: 0.0001
-    license: "check installed rfdetr version (code Apache-2.0; see model card for weights)"
+    license: "Apache-2.0 (rfdetr code and RF-DETR-Seg Nano weights; README checked 2026-10-13)"
 
   # Supplementary experiment, OUTSIDE the equal-time rule: RF-DETR trained until the
   # validation metric stops improving (the 60-min run only fits 2 epochs).
@@ -50,7 +50,7 @@ models:
     early_stopping_patience: 5
     early_stopping_min_delta: 0.001
     supplementary: true
-    license: "see README: RF-DETR licence check"
+    license: "Apache-2.0 (rfdetr code and RF-DETR-Seg Nano weights; README checked 2026-10-13)"
 
 eval:
   score_thr: 0.5                  # detections used for decoding / corner error
