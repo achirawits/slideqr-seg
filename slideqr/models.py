@@ -19,6 +19,23 @@ def long_side_scale(w, h, imgsz):
     return imgsz / max(w, h)
 
 
+def area_resize_long(img, imgsz):
+    """Every model gets the same antialiased (INTER_AREA) downscale to its input size."""
+    H, W = img.shape[:2]
+    s = long_side_scale(W, H, imgsz)
+    if s >= 1:
+        return img
+    return cv2.resize(img, (round(W * s), round(H * s)), interpolation=cv2.INTER_AREA)
+
+
+def upscale_mask(m, W, H):
+    """Mask (probability or 0/1) at network size -> full-resolution bool, the same way for every model."""
+    m = np.asarray(m, np.float32)
+    if m.shape != (H, W):
+        m = cv2.resize(m, (W, H), interpolation=cv2.INTER_LINEAR)
+    return m > 0.5
+
+
 # ---------------------------------------------------------------- Mask R-CNN (torchvision)
 
 def build_maskrcnn(num_classes, imgsz, pretrained=True):
@@ -54,9 +71,7 @@ class MaskRCNNPredictor_:
     def infer(self, img_bgr):
         """Resize + forward pass + the model's own post-processing (network resolution)."""
         torch = self.torch
-        H, W = img_bgr.shape[:2]
-        s = long_side_scale(W, H, self.imgsz)
-        small = cv2.resize(img_bgr, (round(W * s), round(H * s)), interpolation=cv2.INTER_AREA)
+        small = area_resize_long(img_bgr, self.imgsz)
         x = torch.from_numpy(small[..., ::-1].copy()).permute(2, 0, 1).float().div(255).to(self.device)
         with torch.inference_mode():
             return self.model([x])[0]
@@ -68,8 +83,7 @@ class MaskRCNNPredictor_:
         masks = out["masks"][keep, 0].float().cpu().numpy()
         recs = []
         for m, sc, lb in zip(masks, out["scores"][keep].tolist(), out["labels"][keep].tolist()):
-            full = cv2.resize(m, (W, H), interpolation=cv2.INTER_LINEAR) > 0.5
-            recs.append(det_to_record(sc, CLASSES[lb - 1], full))
+            recs.append(det_to_record(sc, CLASSES[lb - 1], upscale_mask(m, W, H)))
         return recs
 
     def n_params(self):
@@ -85,24 +99,20 @@ class YoloPredictor:
         self.model = YOLO(str(weights_path))
         self.imgsz, self.device, self.score_floor, self.max_det = imgsz, device, score_floor, max_det
 
-    def infer(self, img_bgr):
-        """Letterbox + forward + NMS + mask decoding at network resolution."""
-        return self.model.predict(img_bgr, imgsz=self.imgsz, conf=self.score_floor, max_det=self.max_det,
-                                  retina_masks=False, device=self.device, verbose=False)[0]
+    def infer(self, img_bgr, retina=False):
+        """Area-downscale to the network size, then letterbox + forward + NMS + masks."""
+        small = area_resize_long(img_bgr, self.imgsz)
+        return self.model.predict(small, imgsz=self.imgsz, conf=self.score_floor, max_det=self.max_det,
+                                  retina_masks=retina, device=self.device, verbose=False)[0]
 
     def predict(self, img_bgr):
-        r = self.model.predict(img_bgr, imgsz=self.imgsz, conf=self.score_floor, max_det=self.max_det,
-                               retina_masks=True, device=self.device, verbose=False)[0]
+        r = self.infer(img_bgr, retina=True)            # masks at the size of the downscaled input
         if r.masks is None:
             return []
-        masks = r.masks.data.cpu().numpy() > 0.5      # (N, H, W) at the original size
         H, W = img_bgr.shape[:2]
-        recs = []
-        for m, sc, c in zip(masks, r.boxes.conf.tolist(), r.boxes.cls.int().tolist()):
-            if m.shape != (H, W):
-                m = cv2.resize(m.astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST) > 0
-            recs.append(det_to_record(sc, CLASSES[c], m))
-        return recs
+        masks = r.masks.data.cpu().numpy()
+        return [det_to_record(sc, CLASSES[c], upscale_mask(m, W, H))
+                for m, sc, c in zip(masks, r.boxes.conf.tolist(), r.boxes.cls.int().tolist())]
 
     def n_params(self):
         return sum(p.numel() for p in self.model.model.parameters())
@@ -113,15 +123,21 @@ class YoloPredictor:
 class RFDETRPredictor:
     name = "rfdetr"
 
-    def __init__(self, model_obj, class_map, device, score_floor, max_det):
+    def __init__(self, model_obj, class_map, device, score_floor, max_det, resolution):
         self.model = model_obj
         self.class_map = class_map          # rfdetr class id -> our class name
         self.device, self.score_floor, self.max_det = device, score_floor, max_det
+        self.resolution = int(resolution)
 
     def infer(self, img_bgr):
-        """rfdetr's predict (pre-processing, forward, its own post-processing)."""
+        """Area-downscale to the square training resolution, then rfdetr's predict.
+
+        Feeding the full 3264 px image lets predict() downsample it itself; on sharp,
+        noisy images that aliased so badly the model found no code at all (46/46 codes
+        recovered on the affected images once the image is area-downscaled first)."""
         from PIL import Image
-        return self.model.predict(Image.fromarray(img_bgr[..., ::-1]), threshold=self.score_floor)
+        small = cv2.resize(img_bgr, (self.resolution, self.resolution), interpolation=cv2.INTER_AREA)
+        return self.model.predict(Image.fromarray(small[..., ::-1]), threshold=self.score_floor)
 
     def predict(self, img_bgr):
         det = self.infer(img_bgr)
@@ -134,10 +150,7 @@ class RFDETRPredictor:
             name = self.class_map.get(int(det.class_id[i]))
             if name is None:
                 continue
-            m = det.mask[i]
-            if m.shape != (H, W):
-                m = cv2.resize(m.astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST) > 0
-            recs.append(det_to_record(float(det.confidence[i]), name, m))
+            recs.append(det_to_record(float(det.confidence[i]), name, upscale_mask(det.mask[i], W, H)))
         return recs
 
     def n_params(self):

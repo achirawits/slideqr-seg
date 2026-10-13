@@ -39,13 +39,14 @@ def make_predictor(name, cfg, device, score_floor, train_dir):
         sys.path.insert(0, str(ROOT / "scripts"))
         from train import rfdetr_class, rfdetr_resolution
         Model = rfdetr_class()
-        model = Model(pretrain_weights=w, resolution=rfdetr_resolution(Model, imgsz), device=device)
+        res = rfdetr_resolution(Model, imgsz)
+        model = Model(pretrain_weights=w, resolution=res, device=device)
         # rfdetr class_id is the 0-based index into model.class_names, NOT the COCO
         # category id (checked: class_id 1 masks have slide-sized areas)
         names = list(model.class_names)
         if set(names) != set(M.CLASSES):
             raise ValueError(f"unexpected rfdetr class names {names}")
-        return M.RFDETRPredictor(model, dict(enumerate(names)), device, score_floor, max_det)
+        return M.RFDETRPredictor(model, dict(enumerate(names)), device, score_floor, max_det, res)
     raise ValueError(fam)
 
 
