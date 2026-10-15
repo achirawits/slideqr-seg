@@ -65,10 +65,21 @@ def explain(img, s, meta_img, meta_code, ec):
     """Plain-language cause for a code that is not read (Thai, for the slide)."""
     g = s["g"]
     ppm = g["ppm"]
+    H, W = img.shape[:2]
+    q = np.asarray(g["corners"], float).reshape(4, 2)
+    outside = max(0.0, -q[:, 0].min(), -q[:, 1].min(), q[:, 0].max() - W, q[:, 1].max() - H)
+    if outside > 0.5:
+        return (f"รหัสอยู่ริมภาพจนหลุดออกนอกภาพ {outside:.0f} px (≈ {outside / ppm:.1f} module) "
+                f"ตัวถอดรหัสต้องเห็นรหัสครบพร้อมขอบว่างรอบรหัส (quiet zone) จึงอ่านไม่ได้ แม้ใช้มุมจริง "
+                f"→ ภาพจากกล้องต้องครอบกรอบวางสไลด์พร้อมขอบเผื่อ")
     if s["pred"] is None:
         return f"โมเดลหารหัสนี้ไม่เจอ ({ppm:.1f} px/module)"
     o = oracle_reads(img, g, ec)
     degr = []
+    if float(meta_img["deg_vignetting"]) > 0.3:
+        degr.append(f"มุมภาพมืด (vignetting {float(meta_img['deg_vignetting']):.2f})")
+    if float(meta_img["deg_uneven_light"]) > 0.25:
+        degr.append("แสงไม่สม่ำเสมอ")
     if float(meta_img["deg_defocus_sigma"]) > 0:
         degr.append(f"ภาพเบลอจากโฟกัส σ = {float(meta_img['deg_defocus_sigma']):.1f} px")
     if float(meta_img["deg_motion_len"]) > 0:
@@ -98,19 +109,34 @@ def poly_px(pts):
     return np.round((np.asarray(pts) - 0.5) * 16).astype(np.int32)
 
 
-def render(img, sts, focus_id, title, subtitle, caption, fontpath, out_path, width=1920):
+def wrap(d, text, fnt, max_w):
+    lines, cur = [], ""
+    for word in text.split(" "):
+        test = (cur + " " + word).strip()
+        if cur and d.textlength(test, font=fnt) > max_w:
+            lines.append(cur)
+            cur = word
+        else:
+            cur = test
+    lines.append(cur)
+    return lines
+
+
+def render(img, sts, focus_id, title, subtitle, caption, fontpath, out_path, width=1920, height=1080):
+    """1920x1080 slide figure: the three panels stacked (original, masks, read status),
+    a zoomed inset and legend on the right, the explanation at the bottom."""
     H, W = img.shape[:2]
-    # crop to the slide row (all codes + margin)
     allc = np.concatenate([np.asarray(s["g"]["corners"]).reshape(4, 2) for s in sts])
     x0, y0 = allc.min(0)
     x1, y1 = allc.max(0)
-    mx = max(60, (x1 - x0) * 0.08)
-    my = max(80, (y1 - y0) * 1.2)
-    x0, y0 = int(max(0, x0 - mx)), int(max(0, y0 - my))
-    x1, y1 = int(min(W, x1 + mx)), int(min(H, y1 + my * 2.5))
+    side = float(np.median([np.linalg.norm(np.asarray(s["g"]["corners"]).reshape(4, 2)[0]
+                                           - np.asarray(s["g"]["corners"]).reshape(4, 2)[1]) for s in sts]))
+    x0, x1 = int(max(0, x0 - 1.5 * side)), int(min(W, x1 + 1.5 * side))
+    y0, y1 = int(max(0, y0 - 1.6 * side)), int(min(H, y1 + 2.8 * side))
     over = img.copy()
     mask_panel = np.zeros_like(img)
     focus = None
+    lw = max(3, int(side / 18))
     for s in sts:
         g = s["g"]
         col = GREEN if s["warp"] else (ORANGE if s["hybrid"] else RED)
@@ -118,71 +144,76 @@ def render(img, sts, focus_id, title, subtitle, caption, fontpath, out_path, wid
         if s["pred"] is not None:
             m = mask_utils.decode(s["pred"]["rle"]).astype(bool)
             mask_panel[m] = bgr
-            over[m] = (0.5 * over[m] + 0.5 * np.array(bgr)).astype(np.uint8)
+            over[m] = (0.45 * over[m] + 0.55 * np.array(bgr)).astype(np.uint8)
         q = np.asarray(g["corners"]).reshape(4, 2) if s["quad"] is None else s["quad"]
-        cv2.polylines(over, [poly_px(q)], True, bgr, max(3, W // 900), cv2.LINE_AA, 4)
+        cv2.polylines(over, [poly_px(q)], True, bgr, lw, cv2.LINE_AA, 4)
         if g["id"] == focus_id:
-            focus = (q, bgr)
-    panels = [c[y0:y1, x0:x1] for c in (img, mask_panel, over)]
-    gap = 10
-    ph = panels[0].shape[0]
-    pw = (width - 2 * gap - 4 * 20) // 3
-    scale = pw / panels[0].shape[1]
-    ph_s = int(ph * scale)
-    row = np.full((ph_s, width, 3), 255, np.uint8)
-    for k, p in enumerate(panels):
-        r = cv2.resize(p, (pw, ph_s), interpolation=cv2.INTER_AREA)
-        xo = 20 + k * (pw + gap + 20)
-        row[:, xo:xo + pw] = r
-    # zoomed inset of the focus code
-    inset = None
-    if focus is not None:
+            focus = (np.asarray(g["corners"]).reshape(4, 2), bgr)
+    if focus is not None:   # thick frame around the code the story is about
         q, bgr = focus
         c = q.mean(0)
-        half = np.abs(q - c).max() * 1.8
+        r = np.abs(q - c).max() * 1.9
+        cv2.rectangle(over, (int(c[0] - r), int(c[1] - r)), (int(c[0] + r), int(c[1] + r)), bgr, lw * 2)
+    panels = [c[y0:y1, x0:x1] for c in (img, mask_panel, over)]
+    ch, cw = panels[0].shape[:2]
+
+    head_h, foot_h, lab_h, pad = 96, 150, 30, 14
+    right_w = 340
+    pw = width - right_w - 3 * 20
+    ph = int(ch * pw / cw)
+    max_ph = (height - head_h - foot_h - 3 * (lab_h + pad)) // 3
+    if ph > max_ph:
+        ph = max_ph
+        pw = int(cw * ph / ch)
+
+    canvas = Image.new("RGB", (width, height), (255, 255, 255))
+    d = ImageDraw.Draw(canvas)
+    d.rectangle([0, 0, width, 88], fill=(30, 41, 59))
+    d.text((24, 10), title, font=font(fontpath, 38), fill=(255, 255, 255))
+    d.text((24, 56), subtitle, font=font(fontpath, 21), fill=(203, 213, 225))
+    tag = "ภาพจำลอง (SYNTHETIC) - ไม่ใช่ภาพจริง"
+    ft = font(fontpath, 24)
+    tw = d.textlength(tag, font=ft)
+    d.rounded_rectangle([width - tw - 48, 20, width - 20, 68], radius=10, fill=(234, 88, 12))
+    d.text((width - tw - 34, 28), tag, font=ft, fill=(255, 255, 255))
+
+    y = head_h
+    labels = ["ภาพจากกล้อง (ตัดเฉพาะแถวฉลาก)", "mask ที่โมเดลทำนาย", "ผลการอ่านแต่ละรหัส"]
+    for lab, p in zip(labels, panels):
+        d.text((20, y), lab, font=font(fontpath, 21), fill=(51, 65, 85))
+        y += lab_h
+        canvas.paste(Image.fromarray(cv2.resize(p, (pw, ph), interpolation=cv2.INTER_AREA)[..., ::-1]), (20, y))
+        y += ph + pad
+
+    # right column: inset of the focus code, then the legend
+    rx, ry = width - right_w, head_h
+    if focus is not None:
+        q, _ = focus
+        c = q.mean(0)
+        half = np.abs(q - c).max() * 1.9
         a, b = int(max(0, c[1] - half)), int(min(H, c[1] + half))
         l, r_ = int(max(0, c[0] - half)), int(min(W, c[0] + half))
         z = over[a:b, l:r_]
-        inset = cv2.resize(z, (260, int(260 * z.shape[0] / max(1, z.shape[1]))), interpolation=cv2.INTER_NEAREST)
-    # compose with PIL for Thai text
-    head_h, foot_h = 130, 230
-    canvas = Image.new("RGB", (width, head_h + ph_s + foot_h), (255, 255, 255))
-    canvas.paste(Image.fromarray(row[..., ::-1]), (0, head_h))
-    d = ImageDraw.Draw(canvas)
-    d.rectangle([0, 0, width, 92], fill=(30, 41, 59))
-    d.text((24, 14), title, font=font(fontpath, 40), fill=(255, 255, 255))
-    d.text((24, 62), subtitle, font=font(fontpath, 22), fill=(203, 213, 225))
-    tag = "ภาพจำลอง (SYNTHETIC) - ไม่ใช่ภาพจริง"
-    tw = d.textlength(tag, font=font(fontpath, 24))
-    d.rounded_rectangle([width - tw - 48, 22, width - 20, 70], radius=10, fill=(234, 88, 12))
-    d.text((width - tw - 34, 30), tag, font=font(fontpath, 24), fill=(255, 255, 255))
-    for k, lab in enumerate(["ภาพจากกล้อง", "mask ที่โมเดลทำนาย", "ผลการอ่านแต่ละรหัส"]):
-        d.text((20 + k * (pw + gap + 20), head_h - 32), lab, font=font(fontpath, 22), fill=(51, 65, 85))
-    y = head_h + ph_s + 16
-    legend = [(GREEN, "อ่านได้จากการดัดภาพตาม 4 มุม"), (ORANGE, "ดัดภาพไม่ออก แต่ตัดตามกรอบอ่านได้ (วิธีผสม)"),
-              (RED, "ยังอ่านไม่ได้")]
-    x = 24
-    for col, text in legend:
-        d.rectangle([x, y + 4, x + 22, y + 26], fill=col)
-        d.text((x + 30, y), text, font=font(fontpath, 20), fill=(30, 30, 30))
-        x += 40 + int(d.textlength(text, font=font(fontpath, 20)))
-    tx = 24
-    if inset is not None:
-        canvas.paste(Image.fromarray(inset[..., ::-1]), (width - inset.shape[1] - 24, y + 40))
-        d.text((width - inset.shape[1] - 24, y + 44 + inset.shape[0]), "ขยายรหัสที่เป็นประเด็น",
-               font=font(fontpath, 16), fill=(100, 116, 139))
-    wrap_w = width - (320 if inset is not None else 0) - 48
-    lines, cur = [], ""
-    for word in caption.split(" "):
-        test = (cur + " " + word).strip()
-        if d.textlength(test, font=font(fontpath, 24)) > wrap_w:
-            lines.append(cur)
-            cur = word
-        else:
-            cur = test
-    lines.append(cur)
-    for k, line in enumerate(lines[:5]):
-        d.text((tx, y + 46 + k * 34), line, font=font(fontpath, 24), fill=(15, 23, 42))
+        iw = right_w - 30
+        ih = int(iw * z.shape[0] / max(1, z.shape[1]))
+        d.text((rx, ry), "ขยายรหัสที่เป็นประเด็น", font=font(fontpath, 21), fill=(51, 65, 85))
+        canvas.paste(Image.fromarray(cv2.resize(z, (iw, ih), interpolation=cv2.INTER_NEAREST)[..., ::-1]),
+                     (rx, ry + lab_h))
+        ry += lab_h + ih + 24
+    legend = [(GREEN, "อ่านได้จากการดัดภาพ", "ตาม 4 มุมที่โมเดลหาได้"),
+              (ORANGE, "ดัดภาพไม่ออก แต่ตัด", "ตามกรอบอ่านได้ (วิธีผสม)"),
+              (RED, "ยังอ่านไม่ได้", "")]
+    for col, l1, l2 in legend:
+        d.rectangle([rx, ry + 4, rx + 24, ry + 28], fill=col)
+        d.text((rx + 34, ry), l1, font=font(fontpath, 20), fill=(30, 30, 30))
+        if l2:
+            d.text((rx + 34, ry + 26), l2, font=font(fontpath, 20), fill=(30, 30, 30))
+        ry += 64
+
+    fc = font(fontpath, 25)
+    d.line([20, height - foot_h + 4, width - 20, height - foot_h + 4], fill=(203, 213, 225), width=2)
+    for k, line in enumerate(wrap(d, caption, fc, width - 48)[:4]):
+        d.text((24, height - foot_h + 18 + k * 34), line, font=fc, fill=(15, 23, 42))
     canvas.save(out_path, optimize=True)
     return out_path
 
