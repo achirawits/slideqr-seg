@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>17 ข้อมูลสังเคราะห์และแท่นถ่ายภาพ</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .main { display: grid; grid-template-columns: 1fr 470px; gap: 64px; align-content: start; }
+  .rig img { height: 560px; width: auto; margin: 0 auto; }
+  .pts li { font-size: 25px; }
+  .strip { margin-top: 22px; }
+  .strip img { height: 150px; object-fit: cover; object-position: center top; }
+</style>
+</head>
+<body data-section="Research Methodology" data-note="">
+  <h1>ข้อมูลสังเคราะห์และแท่นถ่ายภาพ</h1>
+  <p class="claim">สร้างภาพเองจากแบบจำลองกล้อง จึง<b>รู้ตำแหน่ง 4 มุมแม่นทุกจุด</b>โดยไม่ต้องใช้ภาพผู้ป่วย</p>
+  <div class="main">
+    <div>
+      <ul class="pts">
+        <li>วางฉลากในหน่วย mm แล้วฉายผ่านแบบจำลองกล้อง (homography)</li>
+        <li>DataMatrix 18×18 ขนาด 6.5 mm สุ่ม 2–8 px/module ข้อความสุ่มใหม่ทั้งหมด</li>
+        <li>3,600 ภาพ 19,506 รหัส: ภาพจากแท่น 3,000 ภาพ และถือกล้องด้วยมือ 600 ภาพ</li>
+        <li>แท่นฐาน PLA 380×150 mm กรอบวางสไลด์ 10 ช่อง พร้อมขาจับกล้อง</li>
+      </ul>
+      <figure class="strip"><img src="../assets/strip_raw.png" alt="ภาพสังเคราะห์จากแท่น"><figcaption>ตัวอย่างภาพสังเคราะห์จากแท่น</figcaption></figure>
+    </div>
+    <figure class="rig"><img src="../assets/rig_iso_crop.png" alt="แบบ CAD ของแท่นถ่ายภาพ"><figcaption>แบบ CAD ของแท่นถ่ายภาพ จะพิมพ์ 3 มิติในภาคเรียนหน้า</figcaption></figure>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

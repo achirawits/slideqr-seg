@@ -1,0 +1,186 @@
+%-----------------------------------------------%
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{amsmath,esint,mathtools}
+\usepackage{indentfirst}
+\usepackage{enumitem}
+\usepackage{adjustbox}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xltxtra}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{titlesec}   % for \titleformat, \titlespacing
+\usepackage{etoolbox}   % for \pretocmd
+%------------ สำหรับการทำ Gantt Chart -----------%
+\usepackage{colortbl}
+\usepackage{forloop}
+\newcounter{loopcntr}
+\newcommand{\rpt}[2][1]{%
+  \forloop{loopcntr}{0}{\value{loopcntr}<#1}{#2}%
+}
+\newcommand{\on}[1][1]{
+  \forloop{loopcntr}{0}{\value{loopcntr}<#1}{&\cellcolor{lightgray}}
+}
+\newcommand{\off}[1][1]{
+  \forloop{loopcntr}{0}{\value{loopcntr}<#1}{&}
+}
+
+
+
+\newlength{\firstindentlength}
+\newlength{\secondindentlength}
+\newlength{\thirdindentlength}
+
+\setlength{\firstindentlength}{3em}
+\setlength{\secondindentlength}{7.1em}
+\setlength{\thirdindentlength}{12.2em}
+
+%------------ สำหรับการใช้ฟ้อนท์ภาษาไทย -----------%
+\usepackage[no-math]{fontspec} % สำหรับเลือก font
+\usepackage{polyglossia}     % สำหรับหลายภาษา
+\usepackage{xunicode}
+
+\XeTeXlinebreaklocale "th"
+\XeTeXlinebreakskip = 0pt plus 1pt
+
+\renewcommand{\baselinestretch}{1.6}
+\setmainfont[Script=Thai,Scale=1.4,ItalicFont={THSarabunNew_Italic.ttf}, BoldFont={THSarabunNew_Bold.ttf},BoldItalicFont={THSarabunNew_BoldItalic.ttf} ]{THSarabunNew.ttf}
+\setmonofont[Script=Thai,Scale=0.9]{DroidSansMono.ttf}
+%--------------- เปลี่ยนชื่อรูปและตาราง -------------%
+\usepackage[labelsep=space]{caption}
+\usepackage{enumitem}
+
+\captionsetup{
+  figurename=ภาพที่,
+  tablename=ตารางที่
+}
+
+%-----------------------------------------------%
+\setlength{\parindent}{\firstindentlength}
+\setlist[enumerate]{
+label=\thesection.\arabic*,
+leftmargin=\parindent,
+labelsep=1em,
+itemindent=\parindent,
+}
+\makeatother
+\setlist[itemize]{
+leftmargin=\parindent,
+labelsep=1em,
+itemindent=\parindent,
+}
+\setlist[description]{
+leftmargin=\parindent,
+labelsep=1em,
+itemindent=0.5\parindent,
+}
+%-----------------------------------------------%
+% \setlist[itemize]{%
+%   label=\textbullet
+% }
+% \setlist[enumerate]{label*=\arabic*.}
+
+% \setlist[itemize,1]{%
+%   leftmargin=*,
+%   labelindent=\parindent,
+%   labelsep=1em,
+%   listparindent=0pt
+% }
+% \setlist[itemize,2]{%
+%   leftmargin=*,
+%   labelindent=0em,
+%   labelsep=1em,
+%   listparindent=0pt
+% }
+% \setlist[itemize,3]{%
+%   leftmargin=*,
+%   labelindent=0em,
+%   labelsep=1em,
+%   listparindent=0pt
+% }
+
+% \setlist[enumerate,1]{%
+%   label=\thesection.\arabic*.,
+%   leftmargin=*,
+%   labelindent=\parindent,
+%   labelsep=1em,
+%   listparindent=0pt
+% }
+% \setlist[enumerate,2]{%
+%   label=\thesection.\arabic{enumi}.\arabic*.,
+%   leftmargin=*,
+%   labelindent=0em,
+%   labelsep=1em,
+%   listparindent=0pt
+% }
+% \setlist[enumerate,3]{%
+%   label=\thesection.\arabic{enumi}.\arabic{enumii}.\arabic*.,
+%   leftmargin=*,
+%   labelindent=0em,
+%   labelsep=1em,
+%   listparindent=0pt
+% }
+
+% \setcounter{secnumdepth}{3}
+% \renewcommand\thesection{\arabic{section}}
+% \renewcommand\thesubsection{\thesection.\arabic{subsection}}
+% \renewcommand\thesubsubsection{\thesubsection.\arabic{subsubsection}}
+
+% \titleformat{\section}
+%   {\bfseries\large\upshape}
+%   {\thesection}
+%   {0.45\firstindentlength}
+%   {}
+
+% \titleformat{name=\section,numberless}
+%   {\bfseries\large\upshape}
+%   {}
+%   {0pt}
+%   {}
+
+% \titleformat{\subsection}
+%   {\bfseries\large\upshape}
+%   {\thesubsection}
+%   {0.45\firstindentlength}
+%   {}
+
+% \titleformat{name=\subsection,numberless}
+%   {\bfseries\large\upshape}
+%   {}
+%   {0pt}
+%   {}
+
+% \titleformat{\subsubsection}
+%   {\bfseries\large\upshape}
+%   {\thesubsubsection}
+%   {0.45\firstindentlength}
+%   {}
+
+% \titleformat{name=\subsubsection,numberless}
+%   {\bfseries\large\upshape}
+%   {}
+%   {0pt}
+%   {}
+
+% \titlespacing{\section}
+%   {0pt}
+%   {\baselineskip}
+%   {0\baselineskip}
+
+% \titlespacing{\subsection}
+%   {\firstindentlength}
+%   {\baselineskip}
+%   {0\baselineskip}
+
+% \titlespacing{\subsubsection}
+%   {\secondindentlength}
+%   {\baselineskip}
+%   {0\baselineskip}
+
+% \pretocmd{\section}{\setlength{\parindent}{\firstindentlength}}{}{}
+% \pretocmd{\subsection}{\setlength{\parindent}{\secondindentlength}}{}{}
+% \pretocmd{\subsubsection}{\setlength{\parindent}{\thirdindentlength}}{}{}

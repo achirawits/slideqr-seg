@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>14 GAP และแนวทางแก้</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .t td { padding: 18px 14px; }
+  .t td:first-child { font-weight: 700; color: var(--accent); width: 230px; }
+  .t td:nth-child(2) { color: var(--muted); width: 470px; }
+  .t td:last-child { width: 120px; font-weight: 600; text-align: center; }
+  .t th:last-child { text-align: center; }
+</style>
+</head>
+<body data-section="Research Methodology" data-note="">
+  <h1>GAP และแนวทางแก้</h1>
+  <p class="claim">GAP ทุกข้อมีแนวทางแก้ และ<b>ทุกแนวทางมีวัตถุประสงค์รองรับ</b></p>
+  <div class="main">
+    <table class="t">
+      <thead><tr><th>GAP</th><th>สาเหตุ</th><th>แนวทางแก้ของเรา</th><th>Objective</th></tr></thead>
+      <tbody>
+        <tr><td>Dataset</td><td>ติดป้าย 4 มุมด้วยมือยาก และภาพจริงติด PDPA</td><td>สร้างภาพสังเคราะห์จากแบบจำลองกล้อง รู้ 4 มุมแน่นอน ข้อความบนฉลากสุ่มใหม่</td><td>1</td></tr>
+        <tr><td>Methodological</td><td>กรอบสี่เหลี่ยมไม่แก้ความเอียง</td><td>instance segmentation หา 4 มุม แล้วดัดภาพให้ตรง โดยใช้การตัดกรอบเป็นขั้นสำรอง</td><td>2, 3</td></tr>
+        <tr><td>Evaluation</td><td>งานเดิมวัดแค่การตรวจจับ</td><td>วัดอัตราอ่านได้และการอ่านผิด แยกตาม px/module พร้อม 95% CI</td><td>3, 4</td></tr>
+        <tr><td>Application</td><td>ยังไม่มีงานในบริบทพยาธิวิทยา</td><td>ออกแบบแท่นถ่ายภาพฉลากสไลด์ 10 แผ่น และเลือกกล้องจากผลการทดลอง</td><td>4</td></tr>
+      </tbody>
+    </table>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

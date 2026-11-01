@@ -1,0 +1,118 @@
+\section*{ตัวอย่างการเขียน Latex}
+\subsection*{การใช้ตัวอักษรรูปแบบต่างๆ}
+
+ใน LaTeX, การใช้คำสั่ง \textbf{ตัวหนา} \textit{ตัวเอียง} \underline{ข้อความที่มีเส้นใต้} และ \textbf{\textit{ตัวหนาและตัวเอียง}} สามารถใช้ได้กับข้อความภาษาไทยได้เหมือนกับภาษาอังกฤษ
+
+การใช้เครื่องหมายคำพูด เช่น ``ข้อความที่ต้องการอ้างถึง''
+
+\subsection*{การสร้างรายการแบบ description}
+\begin{description}
+\item[\textbf{First}:] \dotfill
+\item[\textbf{Second}:] \dotfill
+\item[\textbf{Third}:] \dotfill
+\end{description}
+
+\subsection*{การสร้างรายการแบบ enumerate}
+\begin{enumerate}
+\item \textbf{First}: \dotfill
+\item \textbf{Second}: \dotfill
+\item \textbf{Third}: \dotfill
+\end{enumerate}
+
+\subsection*{การสร้างรายการแบบ itemize}
+\begin{itemize}
+\item \textbf{First}: \dotfill
+\item \textbf{Second}: \dotfill
+\item \textbf{Third}: \dotfill
+\end{itemize}
+
+\subsection*{การอ้างอิง}
+\dotfill 
+จากงานวิจัยของ \cite{musikawan2022enhanced,kongsorot2023intrusion} แสดงให้เห็นว่า \dotfill
+
+\cite{musikawan2022enhanced} แสดงให้เห็นว่า \dotfill \cite{kongsorot2023intrusion} แสดงให้เห็นว่า \dotfill
+
+\subsection*{การแทรกสมการและการอ้างอิงในเนื้อหา}
+\begin{equation}
+\frac{dy}{dx}+P(x)y(x)=Q(x)y^n\quad\text{เมื่อ }n\neq 0
+\label{eq:equation_1}
+\end{equation}
+
+\begin{equation}
+\begin{pmatrix}
+\hat{r}\\ \hat{\theta}\\ \hat{\varphi}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\sin\theta\cos\varphi&\sin\theta\sin\varphi&\cos\theta\\
+\cos\theta\cos\varphi&\cos\theta\sin\varphi&-\sin\theta\\
+-\sin\varphi&\cos\varphi&0\\
+\end{pmatrix}
+\begin{pmatrix}
+\hat{x}\\ \hat{y}\\ \hat{z}
+\end{pmatrix}
+\label{eq:equation_2}
+\end{equation}
+
+\begin{align}
+\sum{F}&=ma\nonumber\\
+-kx-bv&=m\frac{d^2x}{dt^2}\nonumber\\
+\frac{d^2x}{dt^2}+\frac{b}{m}\dfrac{dx}{dt}+\frac{k}{m}x&=0
+\label{eq:equation_3}
+\end{align}
+
+จากสมการที่ \ref{eq:equation_1} แสดงให้เห็นว่า \dotfill
+
+จากสมการที่ \ref{eq:equation_1} และ \ref{eq:equation_2} แสดงให้เห็นว่า \dotfill
+
+จากสมการที่ \ref{eq:equation_1} \ref{eq:equation_2} และ \ref{eq:equation_3} แสดงให้เห็นว่า \dotfill
+
+\subsection*{การแทรกรูปภาพและการอ้างอิงในเนื้อหา}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\linewidth]{LaTeX.png}
+\caption{ตัวอย่างการแทรกรูปภาพ}
+\label{fig:my_figure}
+\end{figure}
+
+จากรูปที่ \ref{fig:my_figure} แสดงให้เห็นว่า \dotfill 
+
+\subsection*{การแทรกตารางและการอ้างอิงในเนื้อหา}
+
+\begin{table}[H]
+\centering
+\caption{ตัวอย่างการแทรกตาราง}
+\label{tab:my_label_1}
+\begin{tabular}{cccc}
+\hline
+คอลัมน์ที่ 0 & คอลัมน์ที่ 1 & คอลัมน์ที่ 2  & คอลัมน์ที่ 3 \\ \hline
+- & - & - & - \\
+- & - & - & - \\
+- & - & - & - \\
+- & - & - & - \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{ตัวอย่างการแทรกตาราง}
+\label{tab:my_label_2}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{สาร} & \textbf{ความหนาแน่น (kg/m)}$^\mathbf{3}$\\ \hline
+น้ำ & $1.0\times10^3$ \\ \hline
+อลูมิเนียม & $2.7\times10^3$ \\ \hline
+\end{tabular}
+\end{table}
+
+จากตารางที่ \ref{tab:my_label_1} แสดงให้เห็นว่า \dotfill 
+
+จากตารางที่ \ref{tab:my_label_1} และ \ref{tab:my_label_2} แสดงให้เห็นว่า \dotfill 
+
+\subsection*{การใช้ footnote}
+การใช้ หมายเหตุเชิงเทียน (footnote) ในเอกสารมีข้อดีหลายประการ โดยเฉพาะในกรณีที่คุณต้องการแทรกข้อมูลเพิ่มเติมหรืออ้างอิงแหล่งที่มา (เช่น เว็บไซต์) โดยไม่ทำให้เนื้อหาหลักของเอกสารดูยุ่งเหยิงหรือยาวเกินไป
+
+ตัวอย่าง
+
+For more information on PyTorch, visit the official website\footnote{\url{https://pytorch.org}}.

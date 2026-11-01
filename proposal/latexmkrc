@@ -1,0 +1,2 @@
+# Force XeLaTeX (the Thai template needs fontspec/polyglossia)
+$pdf_mode = 5;

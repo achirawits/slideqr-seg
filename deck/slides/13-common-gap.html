@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>13 Common GAP</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .main { margin-top: 32px; }
+  .chain { display: grid; grid-template-columns: 1fr 60px 1fr 60px 1fr; align-items: stretch; }
+  .step { border-top: 2px solid var(--ink); padding-top: 12px; font-size: 24px; line-height: 1.45; }
+  .step .s { font-family: "Noto Serif Thai", serif; font-size: 34px; font-weight: 600; color: var(--accent); }
+  .step .s small { font-family: "IBM Plex Sans Thai"; font-size: 20px; color: var(--muted); font-weight: 500; margin-left: 10px; }
+  .arr { display: grid; place-items: center; color: var(--faint); font-size: 36px; }
+  .common { margin-top: 30px; background: var(--accent-soft); padding: 22px 28px; font-size: 28px; font-weight: 500; line-height: 1.5; }
+  .common .k { display: block; font-size: 20px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .lower { margin-top: 26px; display: grid; grid-template-columns: 520px 1fr; gap: 56px; }
+  .lower h3 { font-size: 24px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+  .pts li { padding: 9px 0; font-size: 24px; line-height: 1.45; }
+</style>
+</head>
+<body data-section="Literature Review" data-note="">
+  <h1>Common GAP</h1>
+  <p class="claim">แต่ละกลุ่มแก้ได้ทีละส่วน <b>แต่ยังไม่มีงานที่ทำครบทั้งสามขั้นพร้อมกัน</b></p>
+  <div class="main">
+    <div class="chain">
+      <div class="step"><div class="s">X<small>[1] [2]</small></div>ตรวจจับได้แม่น รวมถึงหลายรหัสต่อภาพ แต่หยุดที่กรอบ ไม่วัดการอ่าน</div>
+      <div class="arr">→</div>
+      <div class="step"><div class="s">X → Y<small>[3] [4]</small></div>เพิ่มขั้นถอดรหัส แต่ถอดจากกรอบสี่เหลี่ยม และไม่แยกผลตามความละเอียด</div>
+      <div class="arr">→</div>
+      <div class="step"><div class="s">Y → Z<small>[5]</small></div>หาตำแหน่ง 4 มุมแม่นและอ่านได้ดี แต่ทำทีละรหัสที่ถ่ายใกล้</div>
+    </div>
+    <p class="common"><span class="k">Common GAP</span>ยังไม่มีงานที่หาตำแหน่งระดับ 4 มุมของ DataMatrix เล็กหลายรหัสในภาพเดียว และประเมินถึงขั้นอ่านได้และอ่านผิด แยกตาม px/module</p>
+    <div class="lower">
+      <div>
+        <h3>ประเภทของ GAP</h3>
+        <ul class="pts"><li>Evaluation Gap</li><li>Dataset Gap</li><li>Application Gap</li></ul>
+      </div>
+      <div>
+        <h3>ทำไมยังไม่มีใครทำ</h3>
+        <ul class="pts">
+          <li>ติดป้าย 4 มุมด้วยมือยากและไม่แม่น ชุดข้อมูลเดิมจึงมีแค่กรอบ</li>
+          <li>ภาพจริงมีเลขที่ตัวอย่างผู้ป่วย ติด PDPA จึงเผยแพร่เป็นชุดข้อมูลไม่ได้</li>
+          <li>งานบาร์โค้ดส่วนใหญ่มาจากโลจิสติกส์ ซึ่งรหัสใหญ่และอ่านทีละอัน</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

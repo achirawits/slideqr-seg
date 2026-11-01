@@ -212,9 +212,11 @@ class Tally:
         return out
 
 
-def evaluate_image(img, gts_code, preds, cfg_eval, tally, full_texts=None):
+def evaluate_image(img, gts_code, preds, cfg_eval, tally, full_texts=None, records=None, image_id=None):
     """Update `tally` for one image. gts_code: COCO anns of class code (with payload, ppm,
-    corners, iscrowd). preds: code-class predictions with score, rle, poly."""
+    corners, iscrowd). preds: code-class predictions with score, rle, poly.
+    If `records` is a list, one row per scored code is appended (read / not read per
+    decoder input), for paired statistics across models and decoder inputs."""
     H, W = img.shape[:2]
     thr = cfg_eval["score_thr"]
     preds = [p for p in preds if p["score"] >= thr]
@@ -256,6 +258,13 @@ def evaluate_image(img, gts_code, preds, cfg_eval, tally, full_texts=None):
                     tally.add(ppm, f"{meth}_ok")
             else:
                 tally.add(ppm, f"{meth}_wrong")  # not the code under the prediction, or no code under it
+    if records is not None:
+        detected = {scored[j]["id"] for j in m.values()}
+        for g in scored:
+            row = dict(image_id=image_id, code_id=g["id"], ppm=float(g["ppm"]),
+                       detected=int(g["id"] in detected), full_image=int(g["payload"] in texts))
+            row.update({meth: int(g["id"] in ids) for meth, ids in hit.items()})
+            records.append(row)
     return texts
 
 

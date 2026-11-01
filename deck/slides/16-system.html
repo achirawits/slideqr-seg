@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>16 ภาพรวมระบบ</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .main { margin-top: 34px; }
+  .flow { display: grid; grid-template-columns: 1fr 44px 1fr 44px 1fr 44px 1fr 44px 1fr; align-items: stretch; }
+  .box { border-top: 2px solid var(--ink); padding-top: 10px; font-size: 24px; line-height: 1.4; }
+  .box b { display: block; font-size: 26px; font-weight: 600; }
+  .box.us { border-top-color: var(--accent); }
+  .box.us b { color: var(--accent); }
+  .ar { display: grid; place-items: center; color: var(--faint); font-size: 30px; }
+  .fallback { margin-top: 16px; margin-left: calc((100% - 176px) / 5 * 3 + 132px); font-size: 22px; color: var(--muted); border-left: 2px solid var(--accent); padding-left: 14px; }
+  .imgs { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .imgs img { height: 170px; object-fit: cover; object-position: left center; }
+  .cmp { margin-top: 22px; font-size: 22px; color: var(--muted); }
+</style>
+</head>
+<body data-section="Research Methodology" data-note="">
+  <h1>ภาพรวมระบบ</h1>
+  <p class="claim">หาพื้นที่ของรหัสทุกอัน แล้ว<b>ดัดภาพจาก 4 มุมให้ตรง</b>ก่อนส่งให้ตัวอ่านสำเร็จรูป</p>
+  <div class="main">
+    <div class="flow">
+      <div class="box"><b>ภาพสไลด์ 10 แผ่น</b>ถ่ายจากแท่น ภาพเดียว</div><div class="ar">→</div>
+      <div class="box"><b>Instance segmentation</b>mask ของรหัสแต่ละอัน</div><div class="ar">→</div>
+      <div class="box us"><b>หา 4 มุม</b>จากขอบของ mask</div><div class="ar">→</div>
+      <div class="box us"><b>ดัดภาพ</b>ให้เป็นสี่เหลี่ยมจัตุรัส</div><div class="ar">→</div>
+      <div class="box"><b>zxing-cpp</b>ได้ข้อความในรหัส</div>
+    </div>
+    <p class="fallback">ถ้าดัดภาพแล้วอ่านไม่ได้ ตัดตามกรอบ (ขยายขอบ 25%) แล้วส่งให้ <span class="nw">zxing-cpp</span> อีกครั้ง</p>
+    <div class="imgs">
+      <figure><img src="../assets/strip_mask.png" alt="mask ที่โมเดลทำนาย"><figcaption>mask ที่โมเดลทำนาย</figcaption></figure>
+      <figure><img src="../assets/strip_read.png" alt="ผลการอ่าน"><figcaption>ผลการอ่าน สีเขียวคืออ่านได้จากการดัดภาพ</figcaption></figure>
+    </div>
+    <p class="cmp">วิธีเปรียบเทียบ: ป้อนทั้งภาพ, ตัดตามกรอบอย่างเดียว, ดัดภาพอย่างเดียว และ oracle ที่ใช้ 4 มุมจริงเป็นเพดาน</p>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

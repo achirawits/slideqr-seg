@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>06 RQ และ Objectives</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .t td { padding: 18px 14px; }
+  .t td:first-child { font-weight: 700; color: var(--accent); width: 110px; }
+  .t td:last-child { width: 560px; }
+  .t tr.pre td { color: var(--muted); }
+  .t tr.pre td:first-child { color: var(--faint); }
+</style>
+</head>
+<body data-section="Research Problem &amp; Objectives" data-note="">
+  <h1>Research Questions และ Objectives</h1>
+  <p class="claim">คำถามวิจัย 3 ข้อ วัตถุประสงค์ 4 ข้อ ข้อ 1 สร้างข้อมูล และข้อ 2–4 <b>ตอบคำถามวิจัยทีละข้อ</b></p>
+  <div class="main">
+    <table class="t">
+      <thead><tr><th>RQ</th><th>คำถามวิจัย</th><th>Objective ที่ตอบ</th></tr></thead>
+      <tbody>
+        <tr class="pre"><td>–</td><td>ต้องมีข้อมูลที่รู้ 4 มุมแน่นอนก่อน จึงจะตอบทุกข้อได้</td><td>Obj 1: สร้างชุดข้อมูลสังเคราะห์ที่มี 4 มุมแม่นยำ ควบคุม 2–8 px/module</td></tr>
+        <tr><td>RQ1</td><td>สถาปัตยกรรม segmentation (Mask R-CNN, YOLO11n, YOLO26n, RF-DETR) ส่งผลต่ออัตราอ่านอย่างไร เมื่อฝึกด้วยเวลาเท่ากัน</td><td>Obj 2: เปรียบเทียบ 4 สถาปัตยกรรม ด้วยอัตราอ่าน ความคลาดของมุม และเวลา</td></tr>
+        <tr><td>RQ2</td><td>การดัดภาพจาก 4 มุม (มีการตัดกรอบเป็นขั้นสำรอง) อ่านได้ต่างจากการตัดกรอบอย่างเดียวหรือไม่</td><td>Obj 3: เปรียบเทียบวิธีเตรียมภาพก่อนส่งให้ตัวอ่าน</td></tr>
+        <tr><td>RQ3</td><td>px/module ส่งผลต่ออัตราอ่านอย่างไร และกล้อง 12MP อ่านได้ต่างจาก 8MP หรือไม่</td><td>Obj 4: หาความละเอียดขั้นต่ำ เพื่อเลือกกล้องให้แท่นถ่ายภาพ</td></tr>
+      </tbody>
+    </table>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>19 Proof of Concept</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .main { display: flex; gap: 60px; margin-top: 28px; }
+  .chart { width: 1180px; }
+  .chart h2 { font-size: 24px; font-weight: 600; }
+  .side { flex: 1; display: flex; flex-direction: column; gap: 22px; padding-top: 40px; }
+  .lg-row { display: flex; align-items: center; gap: 12px; font-size: 20px; color: var(--muted); line-height: 1.5; }
+  .lg-main { color: var(--accent); font-weight: 700; }
+  .ev { font-size: 25px; line-height: 1.5; border-top: 1px solid var(--rule); padding-top: 14px; }
+  .ev b { color: var(--accent); }
+</style>
+</head>
+<body data-section="Research Design &amp; Evaluation" data-note="">
+  <h1>Proof of Concept</h1>
+  <p class="claim">ดัดภาพจาก 4 มุมแล้วตัดกรอบเป็นขั้นสำรอง <b>อ่านได้ 95.7%</b> <span class="nw">ที่ความละเอียดของกล้อง 8MP</span></p>
+  <div class="main">
+    <div class="chart">
+      <h2>อัตราอ่านได้ถูกต้องตามความละเอียดของรหัส (YOLO11n, ภาพสังเคราะห์จากแท่น 2,029 รหัส)</h2>
+      <svg id="c" width="1180" height="600"></svg>
+    </div>
+    <div class="side">
+      <div id="lg"></div>
+      <p class="ev">ช่วงกล้อง 8MP: ป้อนทั้งภาพ 64.1% ตัดกรอบ 88.5% วิธีของเรา <b>95.7%</b></p>
+      <p class="ev">ช่วงกล้อง 12MP: <b>99.4%</b> เพดานที่ใช้มุมจริง 100%</p>
+      <p class="ev">อ่านผิด <b>0 ครั้ง</b> จากการอ่านได้ทั้งหมด 4,754 ครั้ง</p>
+    </div>
+  </div>
+<script src="poc.js"></script>
+<script>
+  const t = { font: "IBM Plex Sans Thai", ink: "#1d1d1b", muted: "#5f5e5a", grid: "#e6e4de", band: "#f1e4de", bandText: "#a8361f", accent: "#a8361f", bg: "#fbfaf7", labelSize: 22, tickSize: 20,
+    others: { full: { color: "#b9b7b0", dash: "", width: 3 }, crop: { color: "#6f6d67", dash: "", width: 3 }, warp: { color: "#6f6d67", dash: "10 8", width: 3 }, oracle: { color: "#1d1d1b", dash: "3 7", width: 3 } } };
+  drawPoc(document.getElementById("c"), 1180, 600, t);
+  pocLegend(document.getElementById("lg"), t);
+</script>
+<script src="page.js"></script>
+</body>
+</html>

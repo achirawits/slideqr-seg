@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>15 เหตุผลที่เลือกแนวทางนี้</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .t td { padding: 15px 14px; font-size: 23px; }
+  .t td:first-child { font-weight: 600; width: 360px; }
+  .t td:last-child { width: 560px; color: var(--muted); }
+  .t td:last-child b { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body data-section="Research Methodology" data-note="">
+  <h1>เหตุผลที่เลือกแนวทางนี้</h1>
+  <p class="claim">ทุกการเลือกมี<b>เหตุผลจากงานวิจัยที่อ่าน</b> หรือจากข้อจำกัดของโจทย์ฉลากสไลด์</p>
+  <div class="main">
+    <table class="t">
+      <thead><tr><th>คำถาม</th><th>เหตุผล</th><th>หลักฐาน (จาก paper และผลของเรา)</th></tr></thead>
+      <tbody>
+        <tr><td>ทำไมหา 4 มุมด้วย segmentation ไม่ใช้กรอบ</td><td>mask บอกขอบจริงของรหัส จึงหา 4 มุมแล้วดัดภาพแก้ความเอียงได้</td><td>[3] อ่านได้ <b>98.5% → 80.5%</b> เมื่อรหัสเอียง</td></tr>
+        <tr><td>ทำไมไม่ใช้วิธีของ [5] ตรงๆ</td><td>[5] ต้องมี ROI ให้ก่อน และรหัสต้องใหญ่ แต่ภาพเรามีรหัสเล็กประมาณ 4 px/module 10 อันต่อภาพ</td><td>[5] รหัส <b>≥ 25% ของภาพ</b> และ "assuming ROI has already been identified"</td></tr>
+        <tr><td>ทำไมมีการตัดกรอบเป็นขั้นสำรอง</td><td>ที่ความละเอียดต่ำมาก การดัดภาพอย่างเดียวอ่านได้น้อยกว่าการตัดกรอบ ใช้ขั้นสำรองแบบเดียวกับ [4]</td><td>ที่ 2–2.5 px/module ดัดภาพ <b>53.2%</b> ตัดกรอบ 75.6% (ของเรา)</td></tr>
+        <tr><td>ทำไมเลือก 4 โมเดลนี้</td><td>ครอบคลุม two-stage (Mask R-CNN), one-stage (YOLO11n, YOLO26n) และ transformer SOTA (RF-DETR) ทุกตัวมีรุ่น segmentation และมี license ให้เลือก</td><td>[1][2] YOLO ใช้กับรหัสได้ดี และ [6] เป็น <b>SOTA</b> บน COCO</td></tr>
+        <tr><td>ทำไมใช้ภาพสังเคราะห์</td><td>รู้ 4 มุมแน่นอน ควบคุม px/module ได้ และไม่ต้องใช้ภาพผู้ป่วย (PDPA)</td><td>[4] ก็ฝึกด้วยภาพสังเคราะห์ แล้ว<b>ทดสอบกับภาพจริง</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

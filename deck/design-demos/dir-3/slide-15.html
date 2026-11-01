@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ทิศทาง 3 – Proof of Concept</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#16181d; --muted:#5d6370; --bg:#f2f3f5; --card:#ffffff; --line:#e2e4e9; --accent:#1f56d1; }
+  * { box-sizing:border-box; margin:0; }
+  html, body { width:1920px; height:1080px; background:var(--bg); }
+  body { font-family:"Noto Sans Thai", sans-serif; color:var(--ink); padding:64px 80px 48px; display:flex; flex-direction:column; }
+  header { display:flex; justify-content:space-between; align-items:flex-end; }
+  h1 { font-size:60px; font-weight:700; }
+  header p { font-size:26px; color:var(--muted); text-align:right; line-height:1.4; }
+  .grid { margin-top:36px; flex:1; display:grid; grid-template-columns:1fr 1fr 1fr 430px; grid-template-rows:repeat(3, 1fr); gap:22px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:22px; padding:26px 30px; }
+  .chart { grid-column:1 / 4; grid-row:1 / 4; display:flex; flex-direction:column; }
+  .chart h2 { font-size:26px; font-weight:600; }
+  #lg { display:flex; flex-wrap:wrap; column-gap:28px; row-gap:2px; margin:8px 0 0; }
+  .lg-row { display:flex; align-items:center; gap:10px; font-size:19px; color:var(--muted); }
+  .lg-main { color:var(--accent); font-weight:600; }
+  .kpi { display:flex; flex-direction:column; justify-content:space-between; }
+  .kpi .l { font-size:20px; font-weight:600; color:var(--muted); }
+  .kpi b { font-family:"Inter", sans-serif; font-size:84px; font-weight:700; letter-spacing:-2px; line-height:1; }
+  .kpi p { font-size:22px; color:var(--muted); line-height:1.35; }
+  .kpi.main { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .kpi.main .l, .kpi.main p { color:#d5e0fa; }
+  footer { margin-top:18px; font-size:18px; color:var(--muted); }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Proof of Concept</h1>
+    <p>แนวทางที่เสนอทำได้จริง ภายใต้ GPU เครื่องเดียว</p>
+  </header>
+  <div class="grid">
+    <div class="card chart">
+      <h2>อัตราอ่านได้ถูกต้องตามความละเอียดของรหัส (YOLO11n, ภาพจากแท่น)</h2>
+      <div id="lg"></div>
+      <svg id="c" width="1240" height="640"></svg>
+    </div>
+    <div class="card kpi main"><span class="l">ช่วงกล้อง 8MP</span><b>95.7%</b><p>ตัดกรอบแบบงานเดิมได้ 88.5% ป้อนทั้งภาพได้ 64.1%</p></div>
+    <div class="card kpi"><span class="l">ช่วงกล้อง 12MP</span><b>99.4%</b><p>เพดานที่ใช้มุมจริงได้ 100%</p></div>
+    <div class="card kpi"><span class="l">การอ่านผิด</span><b>0</b><p>จากการอ่านได้ทั้งหมด 4,754 ครั้ง</p></div>
+  </div>
+  <footer>ผลจากภาพสังเคราะห์ ชุดทดสอบจากแท่น 2,029 รหัส ฝึกโมเดล 1 ครั้ง</footer>
+<script src="../shared/poc.js"></script>
+<script>
+  const t = { font:"Noto Sans Thai", ink:"#16181d", muted:"#5d6370", grid:"#eceef2", band:"#e7eefc", bandText:"#1f56d1", accent:"#1f56d1", bg:"#fff", labelSize:21, tickSize:19,
+    others:{ full:{color:"#c3c7cf",dash:"",width:3}, crop:{color:"#5d6370",dash:"",width:3}, warp:{color:"#5d6370",dash:"10 8",width:3}, oracle:{color:"#16181d",dash:"3 7",width:3} } };
+  drawPoc(document.getElementById("c"), 1240, 640, t);
+  pocLegend(document.getElementById("lg"), t);
+</script>
+</body>
+</html>

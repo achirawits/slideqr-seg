@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>22 Feasibility และความเสี่ยง</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .quad { display: grid; grid-template-columns: 1fr 1fr; column-gap: 64px; row-gap: 40px; align-content: start; }
+  .q { border-top: 2px solid var(--ink); padding-top: 12px; }
+  .q h3 { font-size: 28px; font-weight: 600; }
+  .q p { font-size: 24px; line-height: 1.5; margin-top: 6px; }
+  .q.risk { border-top-color: var(--accent); }
+  .q.risk h3 { color: var(--accent); }
+  .num { font-variant-numeric: tabular-nums; font-weight: 600; }
+</style>
+</head>
+<body data-section="Project Planning &amp; Feasibility" data-note="">
+  <h1>Feasibility และความเสี่ยง</h1>
+  <p class="claim">ทำได้ด้วย<b>การ์ดจอเครื่องเดียว</b> ฝึกหลักด้วยภาพสังเคราะห์ และโมเดลที่เลือกเล็กพอรันบน CPU</p>
+  <div class="main quad">
+    <div class="q"><h3>ข้อมูล</h3><p>ภาพสังเคราะห์สร้างได้ไม่จำกัด ไม่มีข้อมูลผู้ป่วย ภาพจริงเก็บในเครื่องเท่านั้น ไม่เผยแพร่ ตามหลัก PDPA และ data minimization</p></div>
+    <div class="q"><h3>GPU และ RAM</h3><p>RTX 5070 (VRAM <span class="num">12 GB</span>) และ RAM <span class="num">32 GB</span> เครื่องเดียว ฝึกโมเดลละ <span class="num">60 นาที</span></p></div>
+    <div class="q"><h3>ใช้งานจริง</h3><p>YOLO11n มี <span class="num">2.9M</span> พารามิเตอร์ ใช้ <span class="num">8 ms</span> ต่อภาพบน GPU และ <span class="num">46 ms</span> บน CPU รันบนคอมพิวเตอร์ในแล็บได้</p></div>
+    <div class="q risk"><h3>ความเสี่ยงและแผนรองรับ</h3><p>ภาพจริงอาจต่างจากภาพสังเคราะห์ (domain gap) แก้โดยเติมภาพจริงจำนวนน้อยมาฝึกเพิ่ม และ license ของ YOLO เป็น AGPL-3.0 จึงมี Mask R-CNN (BSD) กับ RF-DETR (Apache-2.0) เป็นตัวเลือก</p></div>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

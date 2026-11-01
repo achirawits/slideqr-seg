@@ -26,3 +26,15 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 .claude/
+
+# downloaded papers (copyrighted, read locally only)
+papers/
+old_slides/
+
+# deck build tooling and exports
+deck/tools/node_modules/
+deck/*.pdf
+
+# archives and downloaded exports
+*.zip
+proposal_overleaf*.pdf

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>11 กลุ่ม D</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .main { margin-top: 24px; flex: none; display: grid; grid-template-columns: 820px 1fr; gap: 56px; align-items: start; }
+  .pfig { margin-top: 0; }
+  .pfig .mk.box { border-radius: 14px; border-width: 4px; }
+  .lbl { position: absolute; font-size: 18px; font-weight: 700; color: #fff; background: var(--accent); padding: 2px 9px; border-radius: 4px; white-space: nowrap; }
+  .pipe .s { font-size: 18px; }
+  .iwu > * { font-size: 24px; }
+  .gapline { margin-top: 22px; }
+</style>
+</head>
+<body data-section="Literature Review" data-note="">
+  <h1>กลุ่ม D: detector รุ่นล่าสุด</h1>
+  <p class="claim">RF-DETR เป็น SOTA ด้าน real-time detection แต่<b>ยังไม่เคยทดสอบกับรหัสเล็ก</b> และไม่มีขั้นอ่านรหัส</p>
+  <div class="main">
+    <figure class="pfig">
+      <div class="wrap" style="--w:100%">
+        <img src="../assets/paper_6.png" alt="สถาปัตยกรรม RF-DETR จาก paper [6]">
+        <span class="mk box" style="left:21.5%;top:33.5%;width:24.5%;height:59%"></span>
+        <span class="lbl" style="left:21.5%;top:27%">① ViT backbone (DINOv2)</span>
+        <span class="mk box" style="left:54.5%;top:31.5%;width:24%;height:56%"></span>
+        <span class="lbl" style="left:54.5%;top:25%">② DETR decoder</span>
+        <span class="mk box" style="left:80.5%;top:35%;width:17%;height:35%"></span>
+        <span class="lbl" style="left:80.5%;top:71.5%">③ seg head</span>
+      </div>
+      <figcaption>Figure 2 ของ [6]: สถาปัตยกรรม RF-DETR รุ่น nano ได้ <b>48.0 AP</b> บน COCO สูงกว่า D-FINE nano 5.3 AP</figcaption>
+    </figure>
+    <div>
+      <h3 class="paper-h">[6] Robinson et al. · RF-DETR<small>ICLR 2026</small></h3>
+      <div class="pipe"><div class="s">ภาพ</div><div class="a">→</div><div class="s k">① ViT</div><div class="a">→</div><div class="s">② decoder<br>ไม่มี NMS</div><div class="a">→</div><div class="s">③ กรอบ / mask</div></div>
+      <div class="iwu">
+        <div class="k">แนวคิด</div><div>transformer ที่ตั้งต้นจาก DINOv2 ใช้ NAS เลือกขนาดโมเดลได้หลายพันแบบโดยไม่ต้องฝึกใหม่</div>
+        <div class="k">จุดอ่อน</div><div>ทดสอบกับวัตถุทั่วไปบน COCO ยังไม่ทดสอบกับรหัสเล็กหลายอัน และไม่มีขั้นอ่านรหัส</div>
+        <div class="k use">เอามาใช้</div><div>เป็นตัวแทน SOTA ในการเทียบ (RF-DETR-Seg Nano)</div>
+      </div>
+    </div>
+  </div>
+  <p class="gapline"><span class="k">เชื่อมกับงานเรา</span>หาทุกรหัสในภาพทั้งแถวให้ได้ 4 มุมก่อน แล้วเทียบโมเดลรุ่นเก่ากับ SOTA ภายใต้เวลาฝึกเท่ากัน</p>
+<script src="page.js"></script>
+</body>
+</html>

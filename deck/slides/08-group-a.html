@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>08 กลุ่ม A</title>
+<link rel="stylesheet" href="theme.css">
+<style>.main { margin-top: 30px; flex: none; } .gapline { margin-top: 28px; }</style>
+</head>
+<body data-section="Literature Review" data-note="">
+  <h1>กลุ่ม A: ตรวจจับอย่างเดียว</h1>
+  <p class="claim">YOLO ตรวจจับรหัสได้แม่นและเร็ว แต่<b>หยุดที่กรอบสี่เหลี่ยม</b> จึงไม่รู้ว่าอ่านรหัสได้จริงกี่เปอร์เซ็นต์</p>
+  <div class="main cols c2">
+    <div>
+      <h3 class="paper-h">[1] Ershova et al. · YOLO-Barcode<small>Computer Optics 48(4), 2024</small></h3>
+      <div class="pipe"><div class="s">ภาพขาวดำ 512×512</div><div class="a">→</div><div class="s k">YOLO 31 ชั้น + FPN<br>0.14M params</div><div class="a">→</div><div class="s w">กรอบไม่เอียง + ชนิดรหัส 18 แบบ</div></div>
+      <figure class="pfig"><div class="wrap" style="--w:100%"><img src="../assets/paper_1.png" alt="ภาพจาก paper [1]"><span class="mk" style="left:76.2%;top:83.0%;width:5.6%;height:16.8%"></span><span class="mk" style="left:76.2%;top:44.6%;width:5.6%;height:16.8%"></span></div><figcaption>Tab. 2 ของ [1]: F1 บนชุดทดสอบ <b>98.6%</b> เทียบงานเดิม 88.9% และเร็วขึ้น 4 เท่า</figcaption></figure>
+      <div class="iwu">
+        <div class="k">แนวคิด</div><div>YOLO ขนาดเล็กมาก หาและบอกชนิดรหัสได้หลายแบบ รวม DataMatrix และหลายรหัสต่อภาพ</div>
+        <div class="k">จุดอ่อน</div><div>ข้อมูลมีป้าย 4 มุม แต่โมเดลทำนายแค่กรอบไม่เอียง และไม่ได้ส่งต่อให้ตัวอ่าน</div>
+        <div class="k use">เอามาใช้</div><div>ยืนยันว่าตระกูล YOLO หารหัสเล็กหลายอันได้ สนับสนุนการเลือก YOLO มาเทียบ โดยให้ทำนาย mask แทนกรอบ</div>
+      </div>
+    </div>
+    <div>
+      <h3 class="paper-h">[2] Pandya et al. · YOLOv8 n/s/m<small>IEEE INNOCOMP 2024, pp. 740–746</small></h3>
+      <div class="pipe"><div class="s">ภาพ 416×416</div><div class="a">→</div><div class="s k">YOLOv8 n / s / m<br>ฝึก 10 epoch</div><div class="a">→</div><div class="s w">กรอบ 1D / QR</div></div>
+      <figure class="pfig"><div class="wrap" style="--w:100%"><img src="../assets/paper_2.png" alt="ภาพจาก paper [2]"><span class="mk" style="left:64.4%;top:53.3%;width:10.1%;height:27.6%"></span></div><figcaption>บทคัดย่อของ [2]: n 88.95%, <b>s 97.10%</b>, m 94.10% โมเดลใหญ่สุดไม่ได้ดีสุด</figcaption></figure>
+      <div class="iwu">
+        <div class="k">แนวคิด</div><div>เทียบขนาดโมเดล YOLOv8 บนข้อมูล Kaggle 31,078 ภาพ</div>
+        <div class="k">จุดอ่อน</div><div>วัดแค่การตรวจจับ ไม่มี DataMatrix และรายละเอียดการทดลองน้อย</div>
+        <div class="k use">เอามาใช้</div><div>โมเดลใหญ่ไม่ได้ดีกว่าเสมอ สอดคล้องกับที่เราเทียบรุ่นเล็ก (nano) และวัดเวลาประมวลผลด้วย</div>
+      </div>
+    </div>
+  </div>
+  <p class="gapline"><span class="k">GAP ของกลุ่ม</span>ได้แค่กรอบสี่เหลี่ยม ไม่ได้ 4 มุม และไม่วัดว่าอ่านรหัสได้จริง</p>
+<script src="page.js"></script>
+</body>
+</html>

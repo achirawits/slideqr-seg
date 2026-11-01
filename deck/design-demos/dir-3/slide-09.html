@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ทิศทาง 3 – Synthesis Matrix</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#16181d; --muted:#5d6370; --bg:#f2f3f5; --card:#ffffff; --line:#e2e4e9; --accent:#1f56d1; --soft:#e7eefc; }
+  * { box-sizing:border-box; margin:0; }
+  html, body { width:1920px; height:1080px; background:var(--bg); }
+  body { font-family:"Noto Sans Thai", sans-serif; color:var(--ink); padding:64px 80px 48px; display:flex; flex-direction:column; }
+  header { display:flex; justify-content:space-between; align-items:flex-end; }
+  h1 { font-size:60px; font-weight:700; line-height:1.2; }
+  header p { font-size:26px; color:var(--muted); max-width:720px; text-align:right; line-height:1.4; }
+  .grid { margin-top:36px; flex:1; display:grid; grid-template-columns:repeat(4, 1fr); grid-template-rows:1fr 1fr; gap:22px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:22px; padding:24px 26px 20px; display:flex; flex-direction:column; }
+  .tag { font-size:17px; font-weight:600; color:var(--muted); }
+  .card h3 { font-size:28px; font-weight:700; margin-top:4px; line-height:1.25; }
+  .card .m { font-size:19px; color:var(--muted); }
+  .crit { margin-top:auto; display:grid; grid-template-columns:1fr auto; row-gap:7px; font-size:19px; align-items:center; }
+  .crit span { color:var(--muted); }
+  .crit i { font-style:normal; font-family:"Inter", sans-serif; font-weight:700; font-size:17px; width:30px; height:30px; border-radius:9px; display:grid; place-items:center; }
+  .crit i.y { background:var(--ink); color:#fff; }
+  .crit i.n { background:#eceef2; color:#9aa0ab; }
+  .crit i.u { background:#eceef2; color:#9aa0ab; font-size:15px; width:auto; padding:0 8px; font-family:"Noto Sans Thai"; font-weight:500; }
+  .crit .gap { color:var(--accent); font-weight:600; }
+  .ours { grid-column:span 2; background:var(--accent); border-color:var(--accent); color:#fff; }
+  .ours .tag, .ours .m { color:#cdd9f7; }
+  .ours .crit { grid-template-columns:1fr auto 1fr auto; column-gap:18px; row-gap:10px; }
+  .ours .crit span { color:#e4ebfb; }
+  .ours .crit i.y { background:#fff; color:var(--accent); }
+  .ours h3 { font-size:34px; }
+  footer { margin-top:18px; font-size:18px; color:var(--muted); }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Literature Synthesis Matrix</h1>
+    <p>ทุกงานทำได้บางส่วน และไม่มีงานไหนแยกผลตามความละเอียดของภาพ</p>
+  </header>
+  <div class="grid" id="g"></div>
+  <footer>[4] สรุปจากหน้าเว็บวารสาร เพราะดาวน์โหลด PDF ไม่ได้ งานอื่นตรวจกับ PDF ต้นฉบับแล้ว</footer>
+<script>
+  const C = ["หาตำแหน่งจากภาพทั้งภาพ", "ให้ 4 มุม", "วัดว่าอ่านได้จริง", "หลายรหัสในภาพเดียว", "แยกผลตาม px/module", "DataMatrix"];
+  const P = [
+    ["กลุ่ม A ตรวจจับอย่างเดียว", "[1] Ershova 2024", "YOLO-Barcode", "y n n y n y"],
+    ["กลุ่ม A ตรวจจับอย่างเดียว", "[2] Pandya 2025", "YOLOv8 n / s / m", "y n n u n n"],
+    ["กลุ่ม B ตรวจจับแล้วถอดรหัส", "[3] Alsulami 2025", "YOLOv8 + OpenCV", "y n y u n n"],
+    ["กลุ่ม B ตรวจจับแล้วถอดรหัส", "[4] Muallim 2025", "YOLOv8 + GAN + ZBar", "y n y n n n"],
+    ["กลุ่ม C ไม่ใช้ deep learning", "[5] Rybakova 2025", "Fast Hough + grid", "n y y n n y"],
+    ["กลุ่ม D detector รุ่นล่าสุด", "[6] Robinson 2026", "RF-DETR", "y n n u n n"],
+  ];
+  const g = document.getElementById("g");
+  const mark = v => v === "y" ? '<i class="y">✓</i>' : v === "n" ? '<i class="n">✕</i>' : '<i class="u">ไม่ระบุ</i>';
+  for (const [tag, name, m, v] of P) {
+    const vals = v.split(" ");
+    g.insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${tag}</div><h3>${name}</h3><div class="m">${m}</div>
+      <div class="crit">${C.map((c, i) => `<span class="${i === 4 ? "gap" : ""}">${c}</span>${mark(vals[i])}`).join("")}</div></div>`);
+  }
+  g.insertAdjacentHTML("beforeend", `<div class="card ours"><div class="tag">แนวทางที่เสนอ</div><h3>งานของเรา</h3><div class="m">Instance segmentation 4 มุม + ดัดภาพ + zxing-cpp</div>
+    <div class="crit">${C.map(c => `<span>${c}</span><i class="y">✓</i>`).join("")}</div></div>`);
+</script>
+</body>
+</html>
