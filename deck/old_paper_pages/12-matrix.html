@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>12 Literature Synthesis Matrix</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .main { margin-top: 16px; }
+  .t { font-size: 25px; }
+  .t th { text-align: center; }
+  .t th:first-child { text-align: left; }
+  .t td { text-align: center; padding: 5px 12px; line-height: 1.22; }
+  .t td:first-child .src { display: inline; margin-left: 10px; }
+  .t td:first-child { text-align: left; }
+  .t th.gap, .t td.gap { background: var(--accent-soft); }
+  .t th.gap { color: var(--accent); }
+  .t tr.ours td { border-top: 2px solid var(--ink); border-bottom: none; font-weight: 700; padding-top: 12px; }
+  .t tr.ours td { color: var(--accent); }
+</style>
+</head>
+<body data-section="Literature Review" data-note="">
+  <h1>Literature Synthesis Matrix</h1>
+  <p class="claim">ใน 9 งานนี้ไม่มีงานใดได้ครบทุกช่อง และ<b>ไม่มีงานใดแยกผลตามความละเอียดของภาพ</b></p>
+  <div class="main">
+  <table class="t">
+    <thead>
+      <tr><th style="width:23%">งานวิจัย</th><th>หาตำแหน่ง<br>จากภาพทั้งภาพ</th><th>ให้ 4 มุม</th><th>วัดว่า<br>อ่านได้จริง</th><th>หลายรหัส<br>ในภาพเดียว</th><th class="gap">แยกผล<br>ตาม px/module</th><th>DataMatrix</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>[1] Ershova<span class="src">กรอบ, 2024</span></td><td class="y">✓</td><td class="n">✗</td><td class="n">✗</td><td class="y">✓<span class="note">สูงสุด 7 รหัส</span></td><td class="gap n">✗</td><td class="y">✓</td></tr>
+      <tr><td>[2] Pandya<span class="src">กรอบ, 2024</span></td><td class="y">✓</td><td class="n">✗</td><td class="n">✗</td><td class="n">ไม่ระบุ</td><td class="gap n">✗</td><td class="n">✗</td></tr>
+      <tr><td>[3] Alsulami<span class="src">กรอบ, 2026</span></td><td class="y">✓</td><td class="n">✗</td><td class="y">✓</td><td class="n">ไม่ระบุ</td><td class="gap n">✗</td><td class="n">✗</td></tr>
+      <tr><td>[4] Zharkov<span class="src">mask, 2019</span></td><td class="y">✓</td><td class="n">✗<span class="note">กรอบหมุน</span></td><td class="n">✗</td><td class="y">✓</td><td class="gap n">✗</td><td class="y">✓</td></tr>
+      <tr><td>[5] Quenum<span class="src">mask, 2021</span></td><td class="y">✓</td><td class="n">✗</td><td class="n">✗</td><td class="y">✓</td><td class="gap n">✗</td><td class="y">✓</td></tr>
+      <tr><td>[6] Yuan<span class="src">mask, 2019</span></td><td class="y">✓</td><td class="n">✗</td><td class="n">✗</td><td class="y">✓</td><td class="gap n">✗</td><td class="n">✗</td></tr>
+      <tr><td>[7] Rybakova<span class="src">มุม, 2025</span></td><td class="n">✗<span class="note">ต้องมี ROI</span></td><td class="y">✓</td><td class="y">✓</td><td class="n">✗</td><td class="gap n">✗</td><td class="y">✓</td></tr>
+      <tr><td>[8] Liu<span class="src">ขอบ, 2024</span></td><td class="y">✓</td><td class="n">ขอบ L</td><td class="y">✓</td><td class="n">ไม่ระบุ</td><td class="gap n">✗</td><td class="y">✓</td></tr>
+      <tr><td>[9] Corpuz<span class="src">มุม, 2025</span></td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="n">✗</td><td class="gap n">✗</td><td class="n">✗</td></tr>
+      <tr class="ours"><td>งานของเรา</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td class="gap">✓</td><td>✓</td></tr>
+    </tbody>
+  </table>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

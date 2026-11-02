@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>13 GAP และเหตุผลที่เลือกแนวทาง</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .main { margin-top: 22px; }
+  .t td { padding: 10px 14px; line-height: 1.32; }
+  .t td:first-child { font-weight: 700; color: var(--accent); width: 190px; }
+  .t td:nth-child(2) { font-weight: 600; width: 500px; }
+  .t td:nth-child(3) b { color: var(--accent); font-weight: 600; }
+  .t td:last-child { width: 96px; font-weight: 600; text-align: center; }
+  .t th:last-child { text-align: center; }
+</style>
+</head>
+<body data-section="Research Methodology" data-note="">
+  <h1>GAP และเหตุผลที่เลือกแนวทาง</h1>
+  <p class="claim">ทุกการเลือกมี<b>เหตุผลจากงานวิจัยที่อ่าน</b> หรือจากข้อจำกัดของโจทย์ฉลากสไลด์</p>
+  <div class="main">
+    <table class="t">
+      <thead><tr><th>GAP</th><th>แนวทางที่เลือก</th><th>เหตุผลที่เลือก</th><th>Objective</th></tr></thead>
+      <tbody>
+        <tr><td>Dataset</td><td>ใช้ภาพสังเคราะห์</td><td>รู้ 4 มุมแน่นอน คุม px/module ได้ ไม่ใช้ภาพผู้ป่วย และ [5] ก็ทดลองบนภาพสังเคราะห์</td><td>1</td></tr>
+        <tr><td>Methodological</td><td>ใช้ mask หา 4 มุม แทนกรอบ</td><td>[4] [5] [6] ได้ mask แต่ไม่ได้ใช้ต่อ เราจึงดัดภาพแก้เอียง เพราะ [3] รายงานว่ารหัสเอียงแล้วอ่านได้ลดลง</td><td>2, 3</td></tr>
+        <tr><td>Methodological</td><td>ไม่ใช้วิธีของ [7] ตรงๆ</td><td>[7] ต้องมี ROI ให้ก่อน และรหัส <b>≥ 25% ของภาพ</b> แต่ภาพเรามีรหัสเล็ก 10 อัน</td><td>2</td></tr>
+        <tr><td>Methodological</td><td>มีการตัดกรอบเป็นขั้นสำรอง</td><td>ที่ 2–2.5 px/module บนภาพสังเคราะห์ ดัดภาพ <b>53.2%</b> ตัดกรอบ 75.6%</td><td>3</td></tr>
+        <tr><td>Methodological</td><td>เทียบ 4 โมเดลนี้</td><td>ครอบคลุม two-stage, one-stage และ transformer SOTA ทุกตัวมีรุ่น segmentation</td><td>2</td></tr>
+        <tr><td>Evaluation</td><td>วัดการอ่าน แยกตาม px/module</td><td>[1] [2] [4] [5] [6] ไม่วัดการอ่าน และ px/module คือค่าที่บอกว่าภาพต้องละเอียดแค่ไหน</td><td>3, 4</td></tr>
+        <tr><td>Application</td><td>ออกแบบแท่นถ่ายภาพ</td><td>ใน 9 งานนี้ไม่มีงานด้านพยาธิวิทยา และภาพถือมืออ่านได้น้อยกว่าบนแท่น</td><td>4</td></tr>
+      </tbody>
+    </table>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

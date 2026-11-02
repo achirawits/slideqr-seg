@@ -19,6 +19,10 @@ JOBS = {
     "4": ("4_Muallim2025_CMES_BarcodeRestoration.pdf", 5, (60, 62, 556, 250), [("Restore", 0)]),
     "5": ("5_Rybakova2025_DataMatrix_FastHough.pdf", 6, (96, 232, 508, 304), [("0.903", 1), ("0.858", 2)]),
     "6": ("6_Robinson2026_RF-DETR.pdf", 3, (100, 58, 515, 368), [("ViT Backbone", 0), ("Decoder Group", 0), ("Segmentation", 0)]),
+    "z": ("N_Zharkov2019_UniversalBarcodeDetector.pdf", 5, (88, 98, 522, 190), [("0.989", 1)]),
+    "q": ("N_Quenum2021_UHR_Barcode.pdf", 3, (54, 70, 290, 128), [(".466", 0), (".882", 0), (".937", 0)]),
+    "l": ("../core_9/8_Liu2024.pdf", 12, (34, 168, 562, 412), []),
+    "c2": ("N_Corpuz2025_VISAPP_QR.pdf", 3, (306, 231, 528, 354), [("214", 0), ("352", 0), ("459", 0)]),
 }
 res = {}
 for k, (f, p, clip, terms) in JOBS.items():

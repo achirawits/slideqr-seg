@@ -3,12 +3,10 @@ const POC = {
   x: [2.25, 2.75, 3.25, 3.75, 4.25, 4.75, 5.25, 5.75, 6.25, 6.75, 7.25, 7.75],
   series: [
     { key: "full", name: "ป้อนทั้งภาพ", y: [70.7, 70.9, 73.6, 64.1, 73.4, 79.4, 83.1, 85.4, 94.2, 100, 94.4, 96.3] },
-    { key: "crop", name: "ตัดตามกรอบ (งานเดิม)", y: [75.6, 82.0, 92.1, 88.5, 92.7, 96.4, 93.8, 91.1, 90.3, 94.8, 86.1, 86.7] },
-    { key: "warp", name: "ดัดภาพจาก 4 มุม", y: [53.2, 63.4, 82.6, 88.0, 91.1, 96.4, 98.3, 96.8, 97.4, 99.3, 95.8, 96.3] },
-    { key: "oracle", name: "เพดาน: มุมจริง (oracle)", y: [77.6, 85.5, 98.9, 96.7, 96.4, 100, 99.4, 96.8, 97.4, 100, 96.5, 96.3] },
+    { key: "crop", name: "ตัดตามกรอบ (baseline)", y: [75.6, 82.0, 92.1, 88.5, 92.7, 96.4, 93.8, 91.1, 90.3, 94.8, 86.1, 86.7] },
     { key: "hybrid", name: "ดัดภาพ + ตัดกรอบสำรอง (ของเรา)", y: [79.5, 85.5, 97.8, 95.7, 97.4, 99.4, 99.4, 98.7, 97.4, 100, 96.5, 96.3] },
   ],
-  bands: [{ lo: 3.5, hi: 4.0, label: "8MP" }, { lo: 4.5, hi: 5.0, label: "12MP" }],
+  bands: [{ lo: 3.5, hi: 4.0, label: "ประมาณ 4" }],
 };
 
 // theme: {font, ink, muted, grid, band, bandText, accent, others:{key:{color,dash,width}}, labelSize, tickSize}
@@ -44,7 +42,7 @@ function drawPoc(svg, W, H, t) {
     const d = s.y.map((v, i) => `${i ? "L" : "M"}${X(POC.x[i]).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
     el("path", { d, fill: "none", stroke: st.color, "stroke-width": st.width, "stroke-dasharray": st.dash, "stroke-linejoin": "round", "stroke-linecap": "round" });
   }
-  // the 8MP story: values at x = 3.75
+  // the values at about 4 px/module (x = 3.75)
   const at = [["hybrid", 95.7, t.accent, -18], ["crop", 88.5, t.others.crop.color, 34], ["full", 64.1, t.others.full.color, 34]];
   for (const [k, v, c, dy] of at) {
     el("circle", { cx: X(3.75), cy: Y(v), r: 8, fill: c, stroke: t.bg || "#fff", "stroke-width": 3 });

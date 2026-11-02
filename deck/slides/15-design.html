@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>15 การทดลองและตัววัด</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .rows { grid-template-columns: 300px 1fr; align-content: start; }
+  .rows > * { padding: 22px 0; }
+  .rows > :nth-last-child(-n+2) { border-bottom: 1px solid var(--rule); }
+</style>
+</head>
+<body data-section="Research Design &amp; Evaluation" data-note="">
+  <h1>การทดลองและตัววัด</h1>
+  <p class="claim">เทียบแบบยุติธรรม: <b>ฝึกเวลาเท่ากัน ทดสอบภาพชุดเดียวกัน ใช้ตัวอ่านเดียวกัน</b> แล้วทดสอบแบบจับคู่บนรหัสชุดเดียวกัน</p>
+  <div class="main rows">
+    <div class="k">รูปแบบงานวิจัย</div><div>Comparative study และ Ablation (ถอดวิธีเตรียมภาพทีละแบบ)</div>
+    <div class="k">Independent Variable</div><div>โมเดล (4 ตัว), วิธีเตรียมภาพ (4 แบบ), px/module</div>
+    <div class="k">ตัววัดหลัก</div><div>อัตราอ่านได้ = รหัสที่อ่านถูก ÷ รหัสทั้งหมด และการอ่านผิด = จำนวนครั้งที่ข้อความไม่ตรงกับรหัสจริง</div>
+    <div class="k">ตัววัดรอง</div><div>ความคลาดของมุม (px), AP50 และ AP50:95 ของ mask, เวลาต่อภาพ</div>
+    <div class="k">ตัวแปรควบคุม</div><div>ฝึกทุกโมเดล 60 นาที, ภาพทดสอบชุดเดียวกัน, zxing-cpp ตัวเดียวกัน</div>
+    <div class="k">สถิติ</div><div>95% CI แบบ bootstrap สุ่มทั้งภาพ, McNemar ปรับ Holm, Cochran's Q, α = 0.05</div>
+    <div class="k">H0 หลัก (RQ2)</div><div>การดัดภาพจาก 4 มุมที่มีตัดกรอบเป็นขั้นสำรอง ไม่ทำให้อ่านได้มากกว่าการตัดกรอบอย่างเดียวอย่างมีนัยสำคัญทางสถิติ</div>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

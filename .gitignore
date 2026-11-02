@@ -38,3 +38,6 @@ deck/*.pdf
 # archives and downloaded exports
 *.zip
 proposal_overleaf*.pdf
+
+# rule: no PDF in git
+proposal/figures/*.pdf

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>05 สิ่งที่เราจะทำ</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .main { display: grid; grid-template-columns: 1fr 72px 520px; align-items: start; margin-top: 34px; }
+  .step { font-size: 26px; font-weight: 600; margin-bottom: 10px; }
+  .step small { display: block; font-size: 24px; font-weight: 400; color: var(--muted); }
+  .step + figure { margin-bottom: 44px; }
+  .left img { height: auto; }
+  .arr { color: var(--accent); font-size: 52px; display: grid; place-items: center; height: 100%; }
+  .list { border-top: 2px solid var(--ink); }
+  .list div { display: grid; grid-template-columns: 56px 1fr; font-size: 25px; line-height: 1.2; padding: 11px 0; border-bottom: 1px solid var(--rule); font-variant-numeric: tabular-nums; }
+  .list i { font-style: normal; color: var(--muted); }
+  .list .miss { color: var(--accent); font-weight: 600; }
+  .cap { font-size: 22px; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body data-section="Research Problem &amp; Objectives" data-note="">
+  <h1>สิ่งที่เราจะทำ</h1>
+  <p class="claim">ระบบรับภาพเดียว แล้วส่ง<b>รายการเลขรหัสของทั้ง 10 แผ่น</b> พร้อมบอกว่าแผ่นไหนต้องสแกนเอง</p>
+  <div class="main">
+    <div class="left">
+      <p class="step">1. รับภาพ<small>สไลด์ 10 แผ่นในภาพเดียว จากแท่นถ่ายภาพ</small></p>
+      <figure><img src="../assets/strip_raw.png" alt="ภาพสังเคราะห์สไลด์ 10 แผ่น"></figure>
+      <p class="step">2. หารหัสทุกอันแล้วอ่าน<small>หาพื้นที่ของรหัสทีละอัน ดัดภาพให้ตรง แล้วส่งให้ตัวอ่าน</small></p>
+      <figure><img src="../assets/strip_read.png" alt="ภาพสังเคราะห์ที่ระบุรหัสทุกอัน"></figure>
+    </div>
+    <div class="arr">→</div>
+    <div>
+      <p class="step">3. ได้รายการเลขรหัส</p>
+      <div class="list">
+        <div><i>1</i>S58-19946 F 4D</div>
+        <div><i>2</i>S68-77459 C 4D</div>
+        <div><i>3</i>S63-67278 G 1E</div>
+        <div><i>4</i>S61-67471 E 2E</div>
+        <div><i>5</i>S61-60949 A 7F</div>
+        <div><i>6</i>S62-91487 C 5F</div>
+        <div><i>7</i>S66-54423 D 3C</div>
+        <div class="miss"><i>8</i>อ่านไม่ได้ ต้องสแกนเอง</div>
+        <div><i>9</i>S68-35414 C 1C</div>
+        <div><i>10</i>S69-08852 G 9A</div>
+      </div>
+      <p class="cap">ตัวอย่างรูปแบบผลลัพธ์ เลขสุ่มจากภาพสังเคราะห์</p>
+    </div>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

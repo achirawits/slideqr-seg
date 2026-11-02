@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>09 [1] YOLO-Barcode</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .who { font-size: 24px; color: var(--muted); margin-top: 2px; }
+  .claim { margin-top: 8px; font-size: 32px; }
+  .main { margin-top: 20px; flex: none; display: grid; grid-template-columns: 800px 1fr; gap: 48px; align-items: start; }
+  .pfig { margin-top: 0; margin-bottom: 14px; }
+  .pfig .wrap { max-width: 100%; }
+  .side { width: 300px; }
+  .metric { border-top: 2px solid var(--accent); padding-top: 12px; margin-top: 22px; font-size: 28px; line-height: 1.35; }
+  .metric b { font-weight: 600; color: var(--accent); }
+  .lbl { position: absolute; font-size: 18px; font-weight: 700; color: #fff; background: var(--accent); padding: 2px 9px; border-radius: 4px; white-space: nowrap; }
+  .pfig .mk.box { border-radius: 14px; border-width: 4px; }
+  .prof { margin-top: 0; grid-template-columns: 170px 1fr; }
+  .prof > * { padding: 16px 0; font-size: 28px; line-height: 1.35; }
+  .prof > .k { font-size: 24px; padding-top: 19px; }
+  .pfig figcaption { font-size: 22px; }
+</style>
+</head>
+<body data-section="Literature Review" data-note="">
+  <h1>[1] YOLO-Barcode</h1>
+  <p class="who">Ershova et al. · Computer Optics 48(4), 2024 · กลุ่ม A ตรวจจับ</p>
+  <p class="claim">ทำตัวตรวจจับรหัส 18 ชนิดที่เบาพอใช้บนมือถือ <b>ได้ F1 98.6%</b> งานเดิมได้ 88.9%</p>
+  <div class="main">
+    <div>
+      <figure class="pfig"><div class="wrap" style="--w:100%"><img src="../assets/paper_1.png" alt="ภาพจาก paper [1]"><span class="mk" style="left:76.2%;top:83.0%;width:5.6%;height:16.8%"></span><span class="mk" style="left:76.2%;top:44.6%;width:5.6%;height:16.8%"></span></div><figcaption>Tab. 2 ของ [1]: F1 บนชุดทดสอบ <b>98.6%</b> เทียบงานเดิม 88.9% และเร็วขึ้น 4 เท่า</figcaption></figure>
+      <p class="metric"><b>F1</b> สมดุลของ precision (ที่ทายว่าเจอ ถูกกี่ส่วน) กับ recall (ของจริง หาเจอกี่ส่วน)</p>
+    </div>
+    <div class="prof">
+      <div class="k">ปัญหา</div><div>ตัวตรวจจับเดิมผูกกับชนิดรหัส ช้า หรือแม่นน้อย</div>
+      <div class="k">การประยุกต์</div><div>หาบาร์โค้ดจากกล้องมือถือ</div>
+      <div class="k">วิธีและโมเดล</div><div>YOLO 31 ชั้น 0.14M params รับภาพขาวดำ 512×512 ให้กรอบไม่เอียงและชนิดรหัส</div>
+      <div class="k">ข้อมูลและรหัส</div><div>ภาพจริง ZVZ-real 971 ภาพ สูงสุด 7 รหัสต่อภาพ <b>มี DataMatrix เหมือนเรา</b></div>
+      <div class="k">ผล</div><div><span class="r">F1 98.6%</span> เร็วกว่า detector แบบ segmentation เดิม 4 เท่า</div>
+      <div class="k">ข้อจำกัด</div><div>ชุดข้อมูลมีป้าย 4 มุม แต่โมเดลทำนายแค่กรอบไม่เอียง และไม่ได้ส่งต่อให้ตัวอ่าน</div>
+    </div>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

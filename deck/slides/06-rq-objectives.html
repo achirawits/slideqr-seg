@@ -5,24 +5,27 @@
 <title>06 RQ และ Objectives</title>
 <link rel="stylesheet" href="theme.css">
 <style>
-  .t td { padding: 18px 14px; }
-  .t td:first-child { font-weight: 700; color: var(--accent); width: 110px; }
-  .t td:last-child { width: 560px; }
-  .t tr.pre td { color: var(--muted); }
+  .t td { padding: 24px 14px; vertical-align: top; }
+  .t td:first-child { font-weight: 700; color: var(--accent); width: 130px; }
+  .t td:nth-child(2) { font-size: 34px; font-weight: 600; line-height: 1.3; }
+  .t td:nth-child(2) small { display: block; font-size: 24px; font-weight: 400; color: var(--muted); margin-top: 4px; }
+  .t td:last-child { width: 640px; color: var(--muted); }
+  .t tr.pre td, .t tr.pre td:nth-child(2) { color: var(--muted); font-size: 26px; font-weight: 400; }
   .t tr.pre td:first-child { color: var(--faint); }
+  .t td:first-child small { display: block; font-size: 20px; font-weight: 500; }
 </style>
 </head>
 <body data-section="Research Problem &amp; Objectives" data-note="">
   <h1>Research Questions และ Objectives</h1>
-  <p class="claim">คำถามวิจัย 3 ข้อ วัตถุประสงค์ 4 ข้อ ข้อ 1 สร้างข้อมูล และข้อ 2–4 <b>ตอบคำถามวิจัยทีละข้อ</b></p>
+  <p class="claim">คำถามวิจัย 3 ข้อ: <b>โมเดล วิธีเตรียมภาพ และความละเอียด แบบไหนถึงจะเหมาะสม</b></p>
   <div class="main">
     <table class="t">
       <thead><tr><th>RQ</th><th>คำถามวิจัย</th><th>Objective ที่ตอบ</th></tr></thead>
       <tbody>
-        <tr class="pre"><td>–</td><td>ต้องมีข้อมูลที่รู้ 4 มุมแน่นอนก่อน จึงจะตอบทุกข้อได้</td><td>Obj 1: สร้างชุดข้อมูลสังเคราะห์ที่มี 4 มุมแม่นยำ ควบคุม 2–8 px/module</td></tr>
-        <tr><td>RQ1</td><td>สถาปัตยกรรม segmentation (Mask R-CNN, YOLO11n, YOLO26n, RF-DETR) ส่งผลต่ออัตราอ่านอย่างไร เมื่อฝึกด้วยเวลาเท่ากัน</td><td>Obj 2: เปรียบเทียบ 4 สถาปัตยกรรม ด้วยอัตราอ่าน ความคลาดของมุม และเวลา</td></tr>
-        <tr><td>RQ2</td><td>การดัดภาพจาก 4 มุม (มีการตัดกรอบเป็นขั้นสำรอง) อ่านได้ต่างจากการตัดกรอบอย่างเดียวหรือไม่</td><td>Obj 3: เปรียบเทียบวิธีเตรียมภาพก่อนส่งให้ตัวอ่าน</td></tr>
-        <tr><td>RQ3</td><td>px/module ส่งผลต่ออัตราอ่านอย่างไร และกล้อง 12MP อ่านได้ต่างจาก 8MP หรือไม่</td><td>Obj 4: หาความละเอียดขั้นต่ำ เพื่อเลือกกล้องให้แท่นถ่ายภาพ</td></tr>
+        <tr class="pre"><td>–</td><td>ต้องมีข้อมูลที่รู้ตำแหน่งมุมของรหัสแน่นอนก่อน จึงจะตอบทุกข้อได้</td><td>Obj 1: สร้างชุดข้อมูลสังเคราะห์ที่มี 4 มุมแม่นยำ ควบคุม 2–8 px/module</td></tr>
+        <tr><td>RQ1</td><td>ใช้โมเดลไหนถึงจะเหมาะสม<small>โมเดลหาตำแหน่งรหัส: Mask R-CNN, YOLO11n, YOLO26n หรือ RF-DETR</small></td><td>Obj 2: หาโมเดลที่เหมาะสมที่สุดสำหรับหารหัสเล็กหลายรหัสในภาพเดียว ให้อ่านได้มากและเร็วพอใช้งาน</td></tr>
+        <tr><td>RQ2<small>คำถามหลัก</small></td><td>เตรียมภาพแบบไหนถึงจะเหมาะสม<small>ส่งทั้งภาพ ตัดเฉพาะรหัส ดัดรหัสให้ตรง หรือดัดก่อนแล้วตัดเป็นขั้นสำรอง</small></td><td>Obj 3: หาวิธีเตรียมภาพที่อ่านรหัสได้มากที่สุด โดยไม่เพิ่มการอ่านผิด</td></tr>
+        <tr><td>RQ3</td><td>ความละเอียดเท่าไหร่ถึงจะเหมาะสม<small>ภาพต้องชัดแค่ไหน วัดเป็นพิกเซลต่อหนึ่งช่องของรหัส (px/module)</small></td><td>Obj 4: หาความละเอียดที่เหมาะสมต่อการอ่านรหัส</td></tr>
       </tbody>
     </table>
   </div>

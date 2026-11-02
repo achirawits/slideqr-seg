@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>11 [3] อ่านบาร์โค้ดจากภาพโดรน</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .who { font-size: 24px; color: var(--muted); margin-top: 2px; }
+  .claim { margin-top: 8px; font-size: 32px; }
+  .main { margin-top: 20px; flex: none; display: grid; grid-template-columns: 800px 1fr; gap: 48px; align-items: start; }
+  .pfig { margin-top: 0; margin-bottom: 14px; }
+  .pfig .wrap { max-width: 100%; }
+  .side { width: 300px; }
+  .metric { border-top: 2px solid var(--accent); padding-top: 12px; margin-top: 22px; font-size: 28px; line-height: 1.35; }
+  .metric b { font-weight: 600; color: var(--accent); }
+  .lbl { position: absolute; font-size: 18px; font-weight: 700; color: #fff; background: var(--accent); padding: 2px 9px; border-radius: 4px; white-space: nowrap; }
+  .pfig .mk.box { border-radius: 14px; border-width: 4px; }
+  .prof { margin-top: 0; grid-template-columns: 170px 1fr; }
+  .prof > * { padding: 16px 0; font-size: 28px; line-height: 1.35; }
+  .prof > .k { font-size: 24px; padding-top: 19px; }
+  .pfig figcaption { font-size: 22px; }
+</style>
+</head>
+<body data-section="Literature Review" data-note="">
+  <h1>[3] อ่านบาร์โค้ดจากภาพโดรน</h1>
+  <p class="who">Alsulami &amp; Jhanjhi · Scientific Reports 16:399, 2026 · กลุ่ม B ตรวจจับแล้วอ่าน</p>
+  <p class="claim">ใช้ YOLOv8 กับ OpenCV อ่านรหัสจากภาพจำลองมุมโดรน <b>เมื่อรหัสเอียงอ่านได้เหลือ 80.5%</b></p>
+  <div class="main">
+    <div>
+      <figure class="pfig"><div class="wrap" style="--w:86%"><img src="../assets/paper_3.png" alt="ภาพจาก paper [3]"><span class="mk" style="left:26.5%;top:12.7%;width:6.3%;height:17.6%"></span><span class="mk" style="left:26.5%;top:60.9%;width:6.3%;height:17.6%"></span></div><figcaption>Table 12 ของ [3]: แสงดีอ่านได้ 98.5% เมื่อรหัสเอียงเหลือ <b>80.5%</b></figcaption></figure>
+      <p class="metric"><b>mAP@0.5</b> กรอบทับของจริง ≥ 50% นับว่าถูก <b>decoding accuracy</b> สัดส่วนรหัสที่อ่านได้</p>
+    </div>
+    <div class="prof">
+      <div class="k">ปัญหา</div><div>โดรนนับสินค้าเจอแสงน้อย เงา การบดบัง และภาพเบลอ</div>
+      <div class="k">การประยุกต์</div><div>นับสต็อกในคลังสินค้า ส่งผลเข้า MySQL</div>
+      <div class="k">วิธีและโมเดล</div><div>YOLOv8 หากรอบ ตัดภาพตามกรอบ แล้วให้ OpenCV อ่าน</div>
+      <div class="k">ข้อมูลและรหัส</div><div>Roboflow 31,510 ภาพ 1D และ QR เติมภาพจำลองโดรน 300 ภาพ <b>ไม่มี DataMatrix</b></div>
+      <div class="k">ผล</div><div>mAP@0.5 0.922 อ่านได้ 98.5% เมื่อแสงดี <span class="r">80.5% เมื่อเอียง</span></div>
+      <div class="k">ข้อจำกัด</div><div>อ่านจากกรอบ ไม่แยกผลตามความละเอียด และภาพโดรนเป็นภาพจำลอง</div>
+    </div>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

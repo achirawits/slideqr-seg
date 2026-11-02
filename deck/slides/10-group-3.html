@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>10 กลุ่มที่ 3 หามุมหรือขอบ แล้วจัดรหัสให้ตรง</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .claim { margin-top: 4px; }
+  .main { margin-top: 14px; flex: none; display: grid; grid-template-columns: 1090px 1fr; gap: 40px; align-items: start; }
+  .pp { padding: 9px 0 10px; border-top: 1px solid var(--rule); }
+  .pp:first-child { border-top: 2px solid var(--ink); }
+  .pp h3 { font-size: 27px; font-weight: 700; color: var(--accent); line-height: 1.25; }
+  .pp h3 small { font-size: 22px; font-weight: 500; color: var(--muted); margin-left: 8px; }
+  .pp p { display: grid; grid-template-columns: 108px 1fr; font-size: 24px; line-height: 1.3; margin-top: 2px; }
+  .pp .k { font-weight: 700; }
+  .pp b { color: var(--accent); font-weight: 600; }
+  .pfig { margin-top: 0; margin-bottom: 12px; }
+  .pfig .wrap { width: 100%; }
+  .pfig figcaption { font-size: 22px; line-height: 1.3; }
+  .metric { border-top: 2px solid var(--accent); padding-top: 8px; font-size: 24px; line-height: 1.32; }
+  .metric b { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body data-section="Literature Review" data-note="">
+  <h1>กลุ่มที่ 3 หามุมหรือขอบ แล้วจัดรหัสให้ตรง</h1>
+  <p class="claim">หลักการ: หาเรขาคณิตของรหัสก่อนอ่าน <b>อ่านรหัสที่เอียงหรือขอบเสียได้ดีขึ้น</b></p>
+  <div class="main">
+    <div>
+      <section class="pp"><h3>[7] DataMatrix ด้วย Fast Hough <small>Rybakova et al., Computer Optics 2025</small></h3><p><span class="k">ปัญหา</span><span>อ่าน DataMatrix จากกล้องมือถือ</span><span class="k">วิธี</span><span>หาขอบตัว L ได้ 4 มุม แล้ววาง grid อ่าน ไม่ใช้ deep learning</span><span class="k">ข้อมูล</span><span>SE-DMTX-SYN-1000 <b>DataMatrix</b> แต่ 1 รหัสต่อภาพ</span><span class="k">ผล</span><span>ACC <b>0.903</b> zxing-cpp 0.858</span><span class="k">จุดอ่อน</span><span>ต้องมี ROI ให้ก่อน และรหัส ≥ 25% ของภาพ</span></p></section>
+      <section class="pp"><h3>[8] DataMatrix จากขอบเส้นประ <small>Liu et al., Sensors 2024</small></h3><p><span class="k">ปัญหา</span><span>รหัสในโรงงานขอบนูนหรือขาด ตัวอ่านเดิมพลาด</span><span class="k">วิธี</span><span>YOLOv5s หาตำแหน่งคร่าว หาขอบ L เส้นประ แล้วอ่านด้วย libdmtx</span><span class="k">ข้อมูล</span><span>ทดสอบ 265 ภาพ 5 แบบ <b>DataMatrix</b></span><span class="k">ผล</span><span>วิธีเต็มอ่านได้ <b>90.2%</b> รหัสหมุน 85%</span><span class="k">จุดอ่อน</span><span>ไม่ระบุหลายรหัสต่อภาพ และไม่แยกตามความละเอียด</span></p></section>
+      <section class="pp"><h3>[9] QR พร้อมแก้มุมมอง <small>Corpuz et al., VISAPP 2025</small></h3><p><span class="k">ปัญหา</span><span>ตัวอ่านเดิมพลาดเมื่อ QR เอียงหรือแสงแย่</span><span class="k">วิธี</span><span>YOLOv5 หากรอบ Canny หา 4 มุม ดัดภาพ แล้วอ่าน</span><span class="k">ข้อมูล</span><span>Roboflow 1,338 ภาพ <b>QR ไม่มี DataMatrix</b></span><span class="k">ผล</span><span>อ่านได้ <b>459</b> รหัส ZBar 352 OpenCV 214</span><span class="k">จุดอ่อน</span><span>ผู้เขียนระบุว่ายังต้องทำให้รองรับหลาย QR ในภาพเดียว</span></p></section>
+    </div>
+    <div>
+      <figure class="pfig"><div class="wrap"><img src="../assets/paper_c2.png" alt="ตารางจาก paper [9]"><span class="mk" style="left:47.7%;top:41.5%;width:9.7%;height:9.2%"></span><span class="mk" style="left:47.7%;top:51.2%;width:9.7%;height:9.2%"></span><span class="mk" style="left:47.7%;top:60.7%;width:9.7%;height:9.3%"></span></div><figcaption>Table 2 ของ [9]: อ่านได้ <b>459</b> เทียบ ZBar 352 และ OpenCV 214</figcaption></figure>
+      <figure class="pfig"><div class="wrap"><img src="../assets/paper_5.png" alt="ตารางจาก paper [7]"><span class="mk" style="left:74.1%;top:80.7%;width:7.3%;height:21.8%"></span><span class="mk" style="left:74.1%;top:50.6%;width:7.3%;height:21.8%"></span></div><figcaption>Tab. 1 ของ [7]: <b>0.903</b> เทียบ 0.858</figcaption></figure>
+      <p class="metric"><b>mIoU</b> พื้นที่ทับ ÷ พื้นที่รวม <b>ACC / recognition rate</b> สัดส่วนรหัสที่อ่านถูก</p>
+    </div>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

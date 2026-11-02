@@ -90,5 +90,13 @@ figcaption { font-size: 18px; color: var(--muted); margin-top: 8px; }
 .pfig img { width: 100%; height: auto; display: block; border: 1px solid var(--rule); background: #fff; }
 .pfig .mk { position: absolute; border: 3px solid var(--accent); border-radius: 50%; pointer-events: none; }
 .pfig .mk.box { border-radius: 10px; }
-.pfig figcaption { font-size: 19px; margin-top: 6px; }
+.pfig figcaption { font-size: 22px; margin-top: 6px; }
 .pfig figcaption b { color: var(--accent); font-weight: 600; }
+
+/* paper profile rows: their problem / method / data / metric / result */
+.prof { display: grid; grid-template-columns: 136px 1fr; margin-top: 12px; }
+.prof > * { padding: 7px 0; border-top: 1px solid var(--rule); font-size: 24px; line-height: 1.32; }
+.prof > .k { font-size: 21px; font-weight: 600; color: var(--muted); padding-top: 9px; }
+.prof > :nth-last-child(-n+2) { border-bottom: 1px solid var(--rule); }
+.prof b { font-weight: 600; }
+.prof .r { color: var(--accent); font-weight: 600; }

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>08 กลุ่มที่ 1 บอกตำแหน่งด้วยกรอบ</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .claim { margin-top: 4px; }
+  .main { margin-top: 14px; flex: none; display: grid; grid-template-columns: 1090px 1fr; gap: 40px; align-items: start; }
+  .pp { padding: 9px 0 10px; border-top: 1px solid var(--rule); }
+  .pp:first-child { border-top: 2px solid var(--ink); }
+  .pp h3 { font-size: 27px; font-weight: 700; color: var(--accent); line-height: 1.25; }
+  .pp h3 small { font-size: 22px; font-weight: 500; color: var(--muted); margin-left: 8px; }
+  .pp p { display: grid; grid-template-columns: 108px 1fr; font-size: 24px; line-height: 1.3; margin-top: 2px; }
+  .pp .k { font-weight: 700; }
+  .pp b { color: var(--accent); font-weight: 600; }
+  .pfig { margin-top: 0; margin-bottom: 12px; }
+  .pfig .wrap { width: 100%; }
+  .pfig figcaption { font-size: 22px; line-height: 1.3; }
+  .metric { border-top: 2px solid var(--accent); padding-top: 8px; font-size: 24px; line-height: 1.32; }
+  .metric b { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body data-section="Literature Review" data-note="">
+  <h1>กลุ่มที่ 1 บอกตำแหน่งด้วยกรอบ</h1>
+  <p class="claim">หลักการ: ตีกรอบรอบรหัส แล้วตัดภาพตามกรอบ <b>เร็วและแม่น แต่กรอบไม่แก้ความเอียง</b></p>
+  <div class="main">
+    <div>
+      <section class="pp"><h3>[1] YOLO-Barcode <small>Ershova et al., Computer Optics 2024</small></h3><p><span class="k">ปัญหา</span><span>ตัวตรวจจับเดิมช้าหรือแม่นน้อย ใช้กับกล้องมือถือ</span><span class="k">วิธี</span><span>YOLO จิ๋ว 0.14M params ให้กรอบไม่เอียงและชนิดรหัส</span><span class="k">ข้อมูล</span><span>ภาพจริง ZVZ-real 971 ภาพ สูงสุด 7 รหัสต่อภาพ <b>มี DataMatrix</b></span><span class="k">ผล</span><span><b>F1 98.6%</b> งานเดิม 88.9%</span><span class="k">จุดอ่อน</span><span>หยุดที่กรอบ ไม่ส่งต่อให้ตัวอ่าน</span></p></section>
+      <section class="pp"><h3>[2] YOLOv8 n/s/m <small>Pandya et al., IEEE INNOCOMP 2024</small></h3><p><span class="k">ปัญหา</span><span>ขนาดโมเดลมีผลกับงานบาร์โค้ดอย่างไร</span><span class="k">วิธี</span><span>เทียบ YOLOv8 n, s, m</span><span class="k">ข้อมูล</span><span>Kaggle 31,078 ภาพ 1D และ QR <b>ไม่มี DataMatrix</b></span><span class="k">ผล</span><span>accuracy สูงสุดคือ s <b>97.10%</b> แต่ F1 สูงสุดคือ m 0.8785</span><span class="k">จุดอ่อน</span><span>คำตอบขึ้นกับตัววัด และไม่วัดการอ่าน</span></p></section>
+      <section class="pp"><h3>[3] อ่านบาร์โค้ดจากภาพโดรน <small>Alsulami &amp; Jhanjhi, Scientific Reports 2026</small></h3><p><span class="k">ปัญหา</span><span>โดรนนับสินค้าในคลังเจอแสงน้อยและภาพเบลอ</span><span class="k">วิธี</span><span>YOLOv8 หากรอบ ตัดภาพ แล้วให้ OpenCV อ่าน</span><span class="k">ข้อมูล</span><span>Roboflow 31,510 ภาพ และภาพจำลองมุมโดรน 300 ภาพ 1D และ QR <b>ไม่มี DataMatrix</b></span><span class="k">ผล</span><span>อ่านได้ 98.5% เมื่อแสงดี <b>เหลือ 80.5% เมื่อเอียง</b></span><span class="k">จุดอ่อน</span><span>อ่านจากกรอบ ไม่แก้เอียง</span></p></section>
+    </div>
+    <div>
+      <figure class="pfig"><div class="wrap"><img src="../assets/paper_1.png" alt="ตารางจาก paper [1]"><span class="mk" style="left:76.2%;top:83.0%;width:5.6%;height:16.8%"></span><span class="mk" style="left:76.2%;top:44.6%;width:5.6%;height:16.8%"></span></div><figcaption>Tab. 2 ของ [1]: เทียบหลายวิธีบนข้อมูลเดียวกัน F1 <b>98.6%</b> เทียบ 88.9%</figcaption></figure>
+      <figure class="pfig"><div class="wrap"><img src="../assets/paper_3.png" alt="ตารางจาก paper [3]"><span class="mk" style="left:26.5%;top:12.7%;width:6.3%;height:17.6%"></span><span class="mk" style="left:26.5%;top:60.9%;width:6.3%;height:17.6%"></span></div><figcaption>Table 12 ของ [3]: แสงดี 98.5% เมื่อรหัสเอียง <b>80.5%</b></figcaption></figure>
+      <p class="metric"><b>F1</b> สมดุลของทายถูกกับหาครบ <b>mAP@0.5</b> กรอบทับของจริง ≥ 50% นับว่าถูก <b>accuracy ของการอ่าน</b> สัดส่วนรหัสที่อ่านได้</p>
+    </div>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

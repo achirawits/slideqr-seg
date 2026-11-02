@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>12 [4] ซ่อมรหัสด้วย GAN</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .who { font-size: 24px; color: var(--muted); margin-top: 2px; }
+  .claim { margin-top: 8px; font-size: 32px; }
+  .main { margin-top: 20px; flex: none; display: grid; grid-template-columns: 800px 1fr; gap: 48px; align-items: start; }
+  .pfig { margin-top: 0; margin-bottom: 14px; }
+  .pfig .wrap { max-width: 100%; }
+  .side { width: 300px; }
+  .metric { border-top: 2px solid var(--accent); padding-top: 12px; margin-top: 22px; font-size: 28px; line-height: 1.35; }
+  .metric b { font-weight: 600; color: var(--accent); }
+  .lbl { position: absolute; font-size: 18px; font-weight: 700; color: #fff; background: var(--accent); padding: 2px 9px; border-radius: 4px; white-space: nowrap; }
+  .pfig .mk.box { border-radius: 14px; border-width: 4px; }
+  .prof { margin-top: 0; grid-template-columns: 170px 1fr; }
+  .prof > * { padding: 16px 0; font-size: 28px; line-height: 1.35; }
+  .prof > .k { font-size: 24px; padding-top: 19px; }
+  .pfig figcaption { font-size: 22px; }
+</style>
+</head>
+<body data-section="Literature Review" data-note="">
+  <h1>[4] ซ่อมรหัสด้วย GAN</h1>
+  <p class="who">Muallim et al. · CMES 143(3), 2025 · กลุ่ม B ตรวจจับแล้วอ่าน</p>
+  <p class="claim">ซ่อมภาพด้วย GAN เฉพาะรหัสที่อ่านครั้งแรกไม่ได้ <b>QR อ่านได้จาก 15% เป็น 68%</b></p>
+  <div class="main">
+    <div>
+      <figure class="pfig"><div class="wrap" style="--w:86%"><img src="../assets/paper_4.png" alt="ภาพจาก paper [4]"><span class="mk box" style="left:72.8%;top:58.5%;width:17.1%;height:25.5%"></span></div><figcaption>Figure 2 ของ [4]: อ่านไม่ได้จึงส่งไป <b>Restore</b> แล้วอ่านใหม่ (QR 15% → 68%)</figcaption></figure>
+      <p class="metric"><b>decodability</b> สัดส่วนภาพที่ตัวอ่านอ่านได้ <b>SSIM</b> ความคล้ายของภาพ</p>
+    </div>
+    <div class="prof">
+      <div class="k">ปัญหา</div><div>บาร์โค้ดและ QR ที่เสียหาย เช่น ขีดเขียนทับ ถลอก อ่านไม่ได้</div>
+      <div class="k">การประยุกต์</div><div>สายพานโลจิสติกส์ 41 ms บน Jetson Orin Nano</div>
+      <div class="k">วิธีและโมเดล</div><div>YOLOv8 + Kalman ตัดกรอบ ให้ ZBar อ่าน ถ้าไม่ได้ซ่อมด้วย Pix2Pix แล้วอ่านใหม่</div>
+      <div class="k">ข้อมูลและรหัส</div><div>สังเคราะห์ 22,300 ภาพ 1D และ QR รหัสเดียวเต็มภาพ <b>ไม่มี DataMatrix</b></div>
+      <div class="k">ผล</div><div>QR validation <span class="r">15% → 68%</span> ภาพจริง 0% → 90%</div>
+      <div class="k">ข้อจำกัด</div><div>ผู้เขียนยอมรับว่า loss ทำให้ภาพดูเหมือน ไม่ได้ทำให้อ่านได้โดยตรง ภาพจริงชนิดละ 30 ภาพ</div>
+    </div>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

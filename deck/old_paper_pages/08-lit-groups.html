@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>08 การจัดกลุ่มงานวิจัย</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .main { margin-top: 16px; }
+  .t td { padding: 11px 12px; line-height: 1.25; }
+  .t td.g { font-weight: 700; color: var(--accent); width: 200px; vertical-align: top; border-right: 1px solid var(--rule); }
+  .t tbody td.nm { font-weight: 600; width: 270px; padding-left: 14px; color: var(--ink); }
+  .t tbody td.r { font-weight: 500; width: 400px; }
+  .t tr.first td { border-top: 2px solid var(--ink); }
+</style>
+</head>
+<body data-section="Literature Review" data-note="">
+  <h1>การจัดกลุ่มงานวิจัย</h1>
+  <p class="claim">9 งาน แบ่งเป็น 3 กลุ่ม<b>ตามวิธีที่เขาบอกตำแหน่งรหัส</b> แต่ละงานใช้ข้อมูลและตัววัดของตัวเอง</p>
+  <div class="main">
+    <table class="t">
+      <thead><tr><th>กลุ่ม</th><th>งาน</th><th>ปัญหาของเขา</th><th>เขาใช้อะไร</th><th>ผลบนข้อมูลของเขา</th></tr></thead>
+      <tbody>
+        <tr class="first"><td class="g" rowspan="3">1 กรอบ</td><td class="nm">[1] Ershova 2024</td><td>ตัวตรวจจับเดิมช้าหรือแม่นน้อย</td><td>YOLO จิ๋วบนมือถือ</td><td class="r">F1 98.6%</td></tr>
+        <tr><td class="nm">[2] Pandya 2024</td><td>ขนาดโมเดลมีผลอย่างไร</td><td>YOLOv8 n, s, m</td><td class="r">ขนาด s ได้ 97.10%</td></tr>
+        <tr><td class="nm">[3] Alsulami 2026</td><td>โดรนนับสินค้าในคลัง</td><td>YOLOv8 + OpenCV</td><td class="r">อ่านได้ 98.5% เอียงเหลือ 80.5%</td></tr>
+        <tr class="first"><td class="g" rowspan="3">2 mask</td><td class="nm">[4] Zharkov 2019</td><td>รหัสหลายชนิด ต้องใช้โมเดลเดียว</td><td>semantic segmentation ขนาดเล็ก</td><td class="r">detection rate 0.989</td></tr>
+        <tr><td class="nm">[5] Quenum 2021</td><td>ภาพใหญ่มาก ย่อแล้วรหัสหาย</td><td>RPN + Y-Net</td><td class="r">mAP 0.937</td></tr>
+        <tr><td class="nm">[6] Yuan 2019</td><td>mask ของ QR ไม่ครบ</td><td>Mask R-CNN + UNet</td><td class="r">mask AP 17.38</td></tr>
+        <tr class="first"><td class="g" rowspan="3">3 มุมหรือขอบ</td><td class="nm">[7] Rybakova 2025</td><td>อ่าน DataMatrix จากมือถือ</td><td>Fast Hough ไม่ใช้ deep learning</td><td class="r">ACC 0.903</td></tr>
+        <tr><td class="nm">[8] Liu 2024</td><td>รหัสในโรงงานขอบเสีย</td><td>YOLOv5s + ขอบ L เส้นประ</td><td class="r">อ่านได้ 90.2%</td></tr>
+        <tr><td class="nm">[9] Corpuz 2025</td><td>QR เอียงหรือแสงแย่</td><td>YOLOv5 + Canny + ดัดภาพ</td><td class="r">อ่านได้ 459 รหัส</td></tr>
+      </tbody>
+    </table>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>

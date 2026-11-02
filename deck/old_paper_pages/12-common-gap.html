@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>13 Common GAP</title>
+<title>12 Common GAP</title>
 <link rel="stylesheet" href="theme.css">
 <style>
   .main { margin-top: 32px; }
@@ -20,25 +20,25 @@
 </head>
 <body data-section="Literature Review" data-note="">
   <h1>Common GAP</h1>
-  <p class="claim">แต่ละกลุ่มแก้ได้ทีละส่วน <b>แต่ยังไม่มีงานที่ทำครบทั้งสามขั้นพร้อมกัน</b></p>
+  <p class="claim">แต่ละกลุ่มแก้ได้ทีละส่วน <b>แต่ใน 9 งานนี้ยังไม่มีงานที่ต่อครบทั้งสามขั้น</b></p>
   <div class="main">
     <div class="chain">
-      <div class="step"><div class="s">X<small>[1] [2]</small></div>ตรวจจับได้แม่น รวมถึงหลายรหัสต่อภาพ แต่หยุดที่กรอบ ไม่วัดการอ่าน</div>
+      <div class="step"><div class="s">กรอบ<small>[1] [2] [3]</small></div>ตรวจจับแม่นและเร็ว แต่กรอบไม่แก้ความเอียง [3] รายงานว่ารหัสเอียงแล้วอ่านได้ลดลง</div>
       <div class="arr">→</div>
-      <div class="step"><div class="s">X → Y<small>[3] [4]</small></div>เพิ่มขั้นถอดรหัส แต่ถอดจากกรอบสี่เหลี่ยม และไม่แยกผลตามความละเอียด</div>
+      <div class="step"><div class="s">mask<small>[4] [5] [6]</small></div>ได้รูปทรงจริงของรหัส แต่แปลงกลับเป็นกรอบ และไม่วัดการอ่าน</div>
       <div class="arr">→</div>
-      <div class="step"><div class="s">Y → Z<small>[5]</small></div>หาตำแหน่ง 4 มุมแม่นและอ่านได้ดี แต่ทำทีละรหัสที่ถ่ายใกล้</div>
+      <div class="step"><div class="s">มุมหรือขอบ<small>[7] [8] [9]</small></div>จัดรหัสให้ตรงแล้วอ่านดีขึ้น แต่ [7] ทำ 1 รหัสต่อภาพ และ [9] ยังต้องทำให้รองรับหลายรหัส</div>
     </div>
-    <p class="common"><span class="k">Common GAP</span>ยังไม่มีงานที่หาตำแหน่งระดับ 4 มุมของ DataMatrix เล็กหลายรหัสในภาพเดียว และประเมินถึงขั้นอ่านได้และอ่านผิด แยกตาม px/module</p>
+    <p class="common"><span class="k">Common GAP</span>ใน 9 งานนี้ ยังไม่มีงานที่ใช้ mask หา 4 มุมของ DataMatrix เล็กหลายรหัสในภาพเดียว แล้ววัดถึงขั้นอ่านได้และอ่านผิด แยกตาม px/module</p>
     <div class="lower">
       <div>
         <h3>ประเภทของ GAP</h3>
         <ul class="pts"><li>Evaluation Gap</li><li>Dataset Gap</li><li>Application Gap</li></ul>
       </div>
       <div>
-        <h3>ทำไมยังไม่มีใครทำ</h3>
+        <h3>ทำไมยังมีช่องว่างนี้</h3>
         <ul class="pts">
-          <li>ติดป้าย 4 มุมด้วยมือยากและไม่แม่น ชุดข้อมูลเดิมจึงมีแค่กรอบ</li>
+          <li>ติดป้าย 4 มุมของรหัสเล็กด้วยมือทำได้ยากและไม่แม่น</li>
           <li>ภาพจริงมีเลขที่ตัวอย่างผู้ป่วย ติด PDPA จึงเผยแพร่เป็นชุดข้อมูลไม่ได้</li>
           <li>งานบาร์โค้ดส่วนใหญ่มาจากโลจิสติกส์ ซึ่งรหัสใหญ่และอ่านทีละอัน</li>
         </ul>

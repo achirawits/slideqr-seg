@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>14 [6] RF-DETR</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .who { font-size: 24px; color: var(--muted); margin-top: 2px; }
+  .claim { margin-top: 8px; font-size: 32px; }
+  .main { margin-top: 20px; flex: none; display: grid; grid-template-columns: 800px 1fr; gap: 48px; align-items: start; }
+  .pfig { margin-top: 0; margin-bottom: 14px; }
+  .pfig .wrap { max-width: 100%; }
+  .side { width: 300px; }
+  .metric { border-top: 2px solid var(--accent); padding-top: 8px; font-size: 24px; line-height: 1.35; }
+  .metric b { font-weight: 600; color: var(--accent); }
+  .lbl { position: absolute; font-size: 18px; font-weight: 700; color: #fff; background: var(--accent); padding: 2px 9px; border-radius: 4px; white-space: nowrap; }
+  .pfig .mk.box { border-radius: 14px; border-width: 4px; }
+  .prof { margin-top: 0; grid-template-columns: 150px 1fr; }
+  .prof > * { padding: 16px 0; font-size: 26px; }
+  .main { grid-template-columns: 700px 1fr; }
+</style>
+</head>
+<body data-section="Literature Review" data-note="">
+  <h1>[6] RF-DETR</h1>
+  <p class="who">Robinson et al. · ICLR 2026 · กลุ่ม D detector รุ่นใหม่</p>
+  <p class="claim">detector แบบ transformer ที่ใช้ NAS เลือกขนาดโมเดล <b>รุ่น nano ได้ 48.0 AP บน COCO</b></p>
+  <div class="main">
+    <div>
+      <figure class="pfig">
+      <div class="wrap" style="--w:100%">
+        <img src="../assets/paper_6.png" alt="สถาปัตยกรรม RF-DETR จาก paper [6]">
+        <span class="mk box" style="left:21.5%;top:33.5%;width:24.5%;height:59%"></span>
+        <span class="lbl" style="left:21.5%;top:27%">① ViT backbone (DINOv2)</span>
+        <span class="mk box" style="left:54.5%;top:31.5%;width:24%;height:56%"></span>
+        <span class="lbl" style="left:54.5%;top:25%">② DETR decoder</span>
+        <span class="mk box" style="left:80.5%;top:35%;width:17%;height:35%"></span>
+        <span class="lbl" style="left:80.5%;top:71.5%">③ seg head</span>
+      </div>
+      <figcaption>Figure 2 ของ [6]: สถาปัตยกรรม RF-DETR รุ่น nano ได้ <b>48.0 AP</b> บน COCO สูงกว่า D-FINE nano 5.3 AP</figcaption>
+    </figure>
+      <p class="metric"><b>AP</b> ค่า precision เฉลี่ยที่เกณฑ์ IoU 0.50–0.95 ยิ่งสูงยิ่งแม่น</p>
+    </div>
+    <div class="prof">
+      <div class="k">ปัญหา</div><div>detector real-time ส่วนใหญ่ปรับมาเพื่อ COCO ใช้กับข้อมูลอื่นได้ไม่ดี</div>
+      <div class="k">การประยุกต์</div><div>real-time detection ทั่วไป</div>
+      <div class="k">วิธีและโมเดล</div><div>ViT จาก DINOv2 + decoder แบบ DETR ไม่ใช้ NMS + NAS มีรุ่น segmentation</div>
+      <div class="k">ข้อมูลและรหัส</div><div>COCO และ RF100-VL <b>เป็นวัตถุทั่วไป ไม่ใช่รหัส</b></div>
+      <div class="k">ผล</div><div><span class="r">48.0 AP</span> สูงกว่า D-FINE nano 5.3 AP ที่ความเร็วใกล้กัน</div>
+      <div class="k">ข้อจำกัด</div><div>ยังไม่ทดสอบกับรหัสเล็กหลายอัน และไม่มีขั้นอ่านรหัส</div>
+    </div>
+  </div>
+<script src="page.js"></script>
+</body>
+</html>
